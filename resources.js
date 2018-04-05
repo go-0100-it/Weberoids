@@ -1,4 +1,4 @@
-function resources(){
+function init_resources(){
 
     let game_resources = []
 
@@ -33,7 +33,7 @@ function resources(){
     // The callback that is executed when all the images have been loaded or not
     let allLoadedCallback = function(){
         console.log("GOOD NEWS, all images were successfully loaded");
-        init_environment();
+       init_main({getResource: getResource, game_resources: game_resources});
     };
 
     // The onload callback is triggered everytime an image is loaded
@@ -234,10 +234,6 @@ function resources(){
         game_resources[i].loadImage();
         game_resources[i].loadSound();
     }
-
-    return {
-        resourses: game_resources, 
-        getResource: getResource
-    }
+    
 }
 

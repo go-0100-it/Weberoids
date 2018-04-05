@@ -1,18 +1,14 @@
 
-    let media = null;
-    function init(){
-        media = resources();
-    }
-    
-
-    function init_environment(){
+    function init_environment(game){
 
         class Enviornment{
-            constructor(){
+            constructor(game){
                 this.context = null;
                 this.canvas = null;
                 this.lastRender = 0;
                 this.progress = 0;
+                this.resources = null;
+                this.game = game;
             }
             create(tag, w, h, color){
                 let height = (window.innerHeight * 0.99);
@@ -27,18 +23,15 @@
             }
         }
 
-        let environment = new Enviornment();
+        let environment = new Enviornment(game);
         let canvas = environment.create("canvas", 1200, 900, "black");
-
-        nebula = media.getResource("Nebula");
-        ship = media.getResource("Basic ship");
 
         function loop(t){
 
             environment.progress = t - environment.lastRender;
         
             update(environment.progress);
-            draw();
+            draw(environment.context);
         
             environment.lastRender = t;
             window.requestAnimationFrame(loop);
@@ -48,13 +41,13 @@
             // Update the state of the world for the elapsed time since last render
         }
         
-        function draw() {
-            canvas.drawImage(nebula.image, 0, 0, 800, 600, 0, 0, 1200, 900);
-            canvas.drawImage(ship.image, 0, 0, 90, 90, 600-45, 450-45, 90, 90);
+        function draw(canvas) {
+            console.log(game)
+            game.draw(canvas)
             // Draw the state of the world
         }
 
         window.requestAnimationFrame(loop)
-    
+        return {environment: environment};
     }
     

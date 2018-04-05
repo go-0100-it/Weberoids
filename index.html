@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Weberoids</title>
+    <script src="environment.js"></script>
+    <script src="resources.js"></script>
+    <script src="main.js"></script>
+    <style>
+        body{
+            padding: 0;
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        div{
+            padding: 0;
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+            text-align: center;
+        }
+        canvas{
+            padding: 0;
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="container"><img src="load.gif" id="load"></div>
+</body>
+<script>
+    // self executing function here
+    (function() {
+        init();
+    })();
+    </script>
+</html>

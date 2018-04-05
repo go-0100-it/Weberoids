@@ -12,6 +12,16 @@ function resources(){
         return cnt
     }
 
+    function getResource(name){
+        let len = game_resources.length;
+        for(i =0; i < len; i++){
+            if(game_resources[i].name === name){
+                return game_resources[i];
+            }
+        }
+        return null;
+    }
+
        // Create the flag letiables (counter and total of images)
     let _cnt = 0;
     let loaded_cnt = 0;
@@ -79,6 +89,14 @@ function resources(){
                 let src = this.soundUrl;
                 this.sound = new Audio(this.soundUrl);
             }
+        }
+
+        imgWidth(){
+            return this.info.get_size()[0];
+        }
+
+        imgHeight(){
+            return this.info.get_size()[1];
         }
     }
        
@@ -215,6 +233,11 @@ function resources(){
     for(i = 0; i < len; i++){
         game_resources[i].loadImage();
         game_resources[i].loadSound();
+    }
+
+    return {
+        resourses: game_resources, 
+        getResource: getResource
     }
 }
 

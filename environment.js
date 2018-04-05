@@ -42,7 +42,6 @@
         }
         
         function draw(canvas) {
-            console.log(game)
             game.draw(canvas)
             // Draw the state of the world
         }

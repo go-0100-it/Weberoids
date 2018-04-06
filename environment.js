@@ -5,13 +5,11 @@
         console.dir(resources.spriteFactory);
 
         class Enviornment{
-            constructor(game, resources){
+            constructor(resources){
                 this.context = null;
                 this.canvas = null;
                 this.lastRender = 0;
                 this.progress = 0;
-                this.resources = null;
-                this.game = game;
                 this.resources = resources;
             }
             create(tag, w, h, color){
@@ -28,10 +26,9 @@
             
         }
 
-        let game = init_game(resources);
-        let environment = new Enviornment(game, resources);
-        game.env = environment;
+        let environment = new Enviornment(resources);
         let canvas = environment.create("canvas", 1000, 750, "black");
+        let game = init_game(resources, environment);
 
         function loop(t){
 

@@ -39,9 +39,9 @@ function createSpriteFactory(){
             return this.image_size[1];
         }
         
-        update_position(env){
-            this.pos[0] = Sprite.update_dimension(this.pos[0], this.vel[0], env.canvas.width, this.image_size[0])
-            this.pos[1] = Sprite.update_dimension(this.pos[1], this.vel[1], env.canvas.height, this.image_size[1])
+        update_position(canvas, pos){
+            this.pos[0] = pos ? pos[0] : Sprite.update_dimension(this.pos[0], this.vel[0], canvas.width, this.image_size[0])
+            this.pos[1] = pos ? pos[1] : Sprite.update_dimension(this.pos[1], this.vel[1], canvas.height, this.image_size[1])
         }
             
         draw(canvas, env){
@@ -113,8 +113,8 @@ function createSpriteFactory(){
             }   
             let x = this.image_size[0] / 2 - img_ctr[0];
             let y = this.image_size[1] / 2 - img_ctr[1];
-            let new_x = env.canvas.width / 2 - this.image_size[0] / 2
-            let new_y = env.canvas.height / 2 - this.image_size[1] / 2
+            let new_x = this.pos[0] - this.image_size[0] / 2
+            let new_y = this.pos[1] - this.image_size[1] / 2
             canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
             return;
             super.draw();

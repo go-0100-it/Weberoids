@@ -1,14 +1,18 @@
 
-    function init_environment(game){
+    function init_environment(resources){
+
+        console.dir(resources);
+        console.dir(resources.spriteFactory);
 
         class Enviornment{
-            constructor(game){
+            constructor(game, resources){
                 this.context = null;
                 this.canvas = null;
                 this.lastRender = 0;
                 this.progress = 0;
                 this.resources = null;
                 this.game = game;
+                this.resources = resources;
             }
             create(tag, w, h, color){
                 let height = (window.innerHeight * 0.99);
@@ -21,10 +25,13 @@
                 this.context = this.canvas.getContext("2d");
                 return this.context;
             }
+            
         }
 
-        let environment = new Enviornment(game);
-        let canvas = environment.create("canvas", 1200, 900, "black");
+        let game = init_game(resources);
+        let environment = new Enviornment(game, resources);
+        game.env = environment;
+        let canvas = environment.create("canvas", 1000, 750, "black");
 
         function loop(t){
 

@@ -1,9 +1,26 @@
 
 function init_main(resources){
-    console.log(resources);
-    let spriteFactory = createSpriteFactory();
-    let game = init_game(resources, spriteFactory);
-    console.dir(game);
-    let environment = init_environment(game);
+    Array.prototype.diff = function(a){
+        return this.filter(function(i) {return a.indexOf(i) < 0;});
+    };
+    //helper
+    /**
+     * converts degree to radians
+     * @param degree
+     * @returns {number}
+     */
+    Math.rad = function (degree) {
+        return degree * (Math.PI / 180);
+    };
+
+    /**
+     * Converts radian to degree
+     * @param radians
+     * @returns {number}
+     */
+    Math.ang = function (radians) {
+        return radians * (180 / Math.PI);
+    }
+    let environment = init_environment(resources);
     
 }

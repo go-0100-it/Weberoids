@@ -1,6 +1,7 @@
 function init_resources(){
 
     let game_resources = []
+    let spriteFactory = createSpriteFactory();
 
     function getTotalImages(arr){
         cnt = 0
@@ -33,7 +34,7 @@ function init_resources(){
     // The callback that is executed when all the images have been loaded or not
     let allLoadedCallback = function(){
         console.log("GOOD NEWS, all images were successfully loaded");
-       init_main({getResource: getResource, game_resources: game_resources});
+       init_main({getResource: getResource, game_resources: game_resources, spriteFactory: spriteFactory});
     };
 
     // The onload callback is triggered everytime an image is loaded
@@ -161,8 +162,16 @@ function init_resources(){
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
         new Media(
-            "Nebula",
-            new ImageInfo("Nebula", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_blue.f2014.png", [400, 300], [800, 600]),
+            "Blue Nebula",
+            new ImageInfo("Nebula", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_blue.png", [400, 300], [800, 600]),
+            null
+        )
+    )
+    // nebula images - nebula_brown.png, nebula_blue.png
+    game_resources.push(
+        new Media(
+            "Brown Nebula",
+            new ImageInfo("Nebula", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_brown.png", [400, 300], [800, 600]),
             null
         )
     )
@@ -217,7 +226,7 @@ function init_resources(){
         new Media(
             "Asteroid debris explosion",
             new ImageInfo("Asteroid debris explosion", "http://www.davewaters.ca/res/images/asteroid_debris_explode.png", [30, 30], [60, 60], 10, 24, true),
-            "./keyboard.mp3"
+            explosion_sound
         )
     )
     game_resources.push(

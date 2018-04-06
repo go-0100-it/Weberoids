@@ -31,6 +31,15 @@ function createSpriteFactory(){
             }    
         }
 
+        drawRotated(degrees){
+            this.context.clearRect(0,0,canvas.width,canvas.height);
+            this.context.save();
+            this.context.translate(canvas.width/2,canvas.height/2);
+            this.context.rotate(degrees*Math.PI/180);
+            this.context.drawImage(image,-image.width/2,-image.width/2);
+            this.context.restore();
+        }
+
         getWidth(){
             return this.image_size[0];
         }

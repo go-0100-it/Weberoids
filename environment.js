@@ -23,7 +23,6 @@
                 this.context = this.canvas.getContext("2d");
                 return this.context;
             }
-            
         }
 
         let environment = new Enviornment(resources);

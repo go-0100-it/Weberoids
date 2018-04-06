@@ -27,7 +27,9 @@
 
         let environment = new Enviornment(resources);
         let canvas = environment.create("canvas", 1000, 750, "black");
-        let game = init_game(resources, environment);
+        let state = init_game_state();
+        let game = init_game(resources, environment, state);
+
 
         function loop(t){
 

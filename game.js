@@ -1,6 +1,10 @@
-function init_game(resources, env){
+function init_game(resources, env, state){
 
-    let state = init_game_state();
+    let missiles = [];
+    let ships = [];
+    let asteroids = [];
+    let asteroid_debris = [];
+    let explosions = [];
 
     let time = 0;
     let blueNebula = resources.spriteFactory.createStatic([0, 0], [0, 0], 0, 0, resources.getResource("Blue Nebula"));
@@ -8,7 +12,7 @@ function init_game(resources, env){
     ship.update_position(env.canvas, [env.canvas.width / 2, env.canvas.height / 2]);
     let asteroid = resources.spriteFactory.createSpaceProjectile([0, 0], [1, 1], 0, 0, resources.getResource("Asteroid"));
 
-    let draw = function(canvas){
+    function draw(canvas){
 
         // should be calling ship.update(); and ship.draw(); methods here.
         // Also ship.check_for_collisions();
@@ -19,15 +23,22 @@ function init_game(resources, env){
         asteroid.update(env);
 
         // animiate background
-        time += 1
-        let width = env.canvas.width;
-        let height = env.canvas.height;
-        let wtime = (time / 4) % width;
-        let center = debris_info.get_center();
-        let size = debris_info.get_size();
-        canvas.draw_image(nebula_image, nebula_info.get_center(), nebula_info.get_size(), [width / 2, height / 2], [width, height]);
-        canvas.draw_image(debris_image, center, size, (wtime - width / 2, width / 2), (width, height));
-        canvas.draw_image(debris_image, center, size, (wtime + width / 2, width / 2), (width, height));
+
+        
+        /*=====================================================================================================
+         TODO:
+            Add this, as a new function, to a new static sprite class "Background"
+
+            time += 1
+            let width = env.canvas.width;
+            let height = env.canvas.height;
+            let wtime = (time / 4) % width;
+            let center = debris_info.get_center();
+            let size = debris_info.get_size();
+            canvas.draw_image(debris_image, center, size, (wtime - width / 2, width / 2), (width, height));
+            canvas.draw_image(debris_image, center, size, (wtime + width / 2, width / 2), (width, height));
+
+        =======================================================================================================*/
 
 
 
@@ -103,10 +114,37 @@ function init_game(resources, env){
         if(!game_on){
             canvas.draw_image(splash_image, splash_info.get_center(), splash_info.get_size(), [width / 2, height / 2], splash_info.get_size());
         }
-            
+    }
 
+    function start(){
+        this.game_on = True;
+        this.reset_view();
+        this.score = 0;
+        this.level = 1;
+        this.lives = this.game.lives;
+        this.game.spawn_timer.start();
+    }
 
+    function pause(){
+    }
+
+    function end(){
+        this.game_on = False;
+        soundtrack.pause();
+        soundtrack.rewind();
+    }
+
+    function reset_view(){
+        env = this.game.env;
+        ship = this.game.sprite("Basic ship");
+        if(this.game_on){
+            this.game.missiles = set([]);
+            this.game.asteroids = set([]);
+            this.game.asteroid_debris = set([]);
+            this.game.explosions = set([]);
+            this.game.add_sprite(Ship(env.center(), [0, 0], 0, ship.image, ship.info, this.game, ship.sound));
         }
+    }
     
     return {draw: draw};
 }

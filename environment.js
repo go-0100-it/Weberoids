@@ -1,9 +1,6 @@
 
     function init_environment(resources){
 
-        console.dir(resources);
-        console.dir(resources.spriteFactory);
-
         class Enviornment{
             constructor(resources){
                 this.context = null;
@@ -11,6 +8,7 @@
                 this.lastRender = 0;
                 this.progress = 0;
                 this.resources = resources;
+                this.center = null;
             }
             create(tag, w, h, color){
                 let height = (window.innerHeight * 0.99);
@@ -21,6 +19,7 @@
 
                 this.canvas = document.getElementById(tag);
                 this.context = this.canvas.getContext("2d");
+                this.center = [this.canvas.width / 2, this.canvas.height / 2];
                 return this.context;
             }
         }
@@ -29,15 +28,11 @@
         let canvas = environment.create("canvas", 1000, 750, "black");
         let state = init_game_state();
         let game = init_game(resources, environment, state);
-
+        let input = init_input_handler(game, environment);
 
         function loop(t){
-
             environment.progress = t - environment.lastRender;
-        
-            update(environment.progress);
-            draw(environment.context);
-        
+            draw(environment);
             environment.lastRender = t;
             window.requestAnimationFrame(loop);
         }
@@ -46,8 +41,8 @@
             // Update the state of the world for the elapsed time since last render
         }
         
-        function draw(canvas) {
-            game.draw(canvas)
+        function draw(environment) {
+            game.draw(environment)
             // Draw the state of the world
         }
 

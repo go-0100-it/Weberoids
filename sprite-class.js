@@ -18,11 +18,11 @@ function createSpriteFactory(){
             }  
         }
 
-        static update_dimension(pos, vel, axis, size){
-            if(pos + vel > axis + size / 2){
+        static update_dimension(pos, vel, axis, radius){
+            if(pos + vel > axis + radius / 2){
                 return 0;
             }
-            else if(pos + vel < 0 - size / 2){
+            else if(pos + vel < 0 - radius / 2){
                 return axis;
             }  
             else{
@@ -31,13 +31,12 @@ function createSpriteFactory(){
             }    
         }
 
-        drawRotated(degrees){
-            this.context.clearRect(0,0,canvas.width,canvas.height);
-            this.context.save();
-            this.context.translate(canvas.width/2,canvas.height/2);
-            this.context.rotate(degrees*Math.PI/180);
-            this.context.drawImage(image,-image.width/2,-image.width/2);
-            this.context.restore();
+        drawRotated(canvas, x, y, new_x, new_y){
+            canvas.save();
+            canvas.translate(new_x / 2, new_y / 2);
+            canvas.rotate(Math.rad(this.angle));
+            canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
+            canvas.restore();
         }
 
         getWidth(){
@@ -48,22 +47,28 @@ function createSpriteFactory(){
             return this.image_size[1];
         }
         
-        update_position(canvas, pos){
-            this.pos[0] = pos ? pos[0] : Sprite.update_dimension(this.pos[0], this.vel[0], canvas.width, this.image_size[0])
-            this.pos[1] = pos ? pos[1] : Sprite.update_dimension(this.pos[1], this.vel[1], canvas.height, this.image_size[1])
+        update_position(env, pos){
+            this.pos[0] = pos ? pos[0] : Sprite.update_dimension(this.pos[0], this.vel[0], env.canvas.width, this.image_size[0])
+            this.pos[1] = pos ? pos[1] : Sprite.update_dimension(this.pos[1], this.vel[1], env.canvas.height, this.image_size[1])
         }
             
         draw(canvas, env){
             let img_ctr = this.image_center;
+            let half_img_x = this.image_size[0] / 2
+            let half_img_y = this.image_size[1] / 2
             if(this.animated){
-                cnt = math.ceil(this.age/10);
                 img_ctr = [this.image_center[0] + this.image_size[0] * this.age, this.image_center[1]];   
-            }   
-            let x = this.image_size[0] / 2 - img_ctr[0];
-            let y = this.image_size[1] / 2 - img_ctr[1];
-            let new_x = this.pos[0] - this.image_size[0] / 2
-            let new_y = this.pos[1] - this.image_size[1] / 2
-            canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
+            }  
+            let x = img_ctr[0] - half_img_x;
+            let y = img_ctr[0] - half_img_y;
+            let new_x = this.pos[0] - half_img_x;
+            let new_y = this.pos[1] - half_img_y;
+            if(this.angle !== 0){
+                this.drawRotated(canvas, x, y, new_x, new_y)
+            }else{
+                canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
+            }
+            
         }   
         
         update(env){

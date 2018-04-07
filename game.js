@@ -12,11 +12,11 @@ function init_game(resources, env, state){
     ship.update_position(env.canvas, [env.canvas.width / 2, env.canvas.height / 2]);
     let asteroid = resources.spriteFactory.createSpaceProjectile([0, 0], [1, 1], 0, 0, resources.getResource("Asteroid"));
 
-    function draw(canvas){
-
+    function draw(environment){
+        let canvas = environment.context
+        let time_factor = environment.progress/(1000/60)
         // should be calling ship.update(); and ship.draw(); methods here.
         // Also ship.check_for_collisions();
-
         blueNebula.draw(canvas, env);
         ship.draw(canvas, env);
         asteroid.draw(canvas, env);
@@ -107,13 +107,14 @@ function init_game(resources, env, state){
         explosions = explosions.diff(explosions_to_remove);
         
         // splash screen
+        /*
             canvas.draw_text('Lives', (20, 20), 24, 'Red')
             canvas.draw_text(str(lives), (20, 40), 20, 'Red')
             canvas.draw_text('Score', (100, 20), 24, 'Red')
             canvas.draw_text(str(score), (100, 40), 20, 'Red')
         if(!game_on){
             canvas.draw_image(splash_image, splash_info.get_center(), splash_info.get_size(), [width / 2, height / 2], splash_info.get_size());
-        }
+        }*/
     }
 
     function start(){
@@ -146,5 +147,8 @@ function init_game(resources, env, state){
         }
     }
     
-    return {draw: draw};
+    return {
+        draw: draw,
+        ship: ship
+    };
 }

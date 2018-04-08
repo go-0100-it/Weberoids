@@ -1,5 +1,5 @@
 
-    function init_environment(resources, size){
+    function init_environment(resources, size, factory){
 
         class Enviornment{
             constructor(resources, size){
@@ -24,22 +24,24 @@
         let environment = new Enviornment(resources);
         let canvas = environment.create("canvas", size, "black");
         let state = init_game_state();
-        let game = init_game(resources, environment, state);
+        let game = init_game(resources, environment);
         let input = init_input_handler(game, environment);
 
         function loop(t){
-            environment.progress = t - environment.lastRender;
-            draw(environment);
+            let progress = t - environment.lastRender;
+            let factor = progress / (1000 / 60)
+            draw(environment, factor);
             environment.lastRender = t;
             window.requestAnimationFrame(loop);
         }
 
         function update(progress) {
             // Update the state of the world for the elapsed time since last render
+            console.log(progress)
         }
         
-        function draw(environment) {
-            game.draw(environment)
+        function draw(environment, factor) {
+            game.draw(environment, factor)
             // Draw the state of the world
         }
 

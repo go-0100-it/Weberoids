@@ -1,5 +1,5 @@
 
-function init_main(resources){
+function init_main(resources, factory){
     Array.prototype.diff = function(a){
         return this.filter(function(i) {return a.indexOf(i) < 0;});
     };

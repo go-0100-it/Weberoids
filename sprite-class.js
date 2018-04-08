@@ -18,11 +18,26 @@ function createSpriteFactory(){
             }  
         }
 
-        static update_dimension(pos, vel, axis, radius){
-            if(pos + vel > axis + radius / 2){
+        // helper functions to handle transformations
+        static dist(p,q){
+            return Math.sqrt((p[0] - q[0]) ** 2+(p[1] - q[1]) ** 2)
+        }
+            
+
+        static collision_detect(obj1, obj2){
+            if(Sprite.dist(obj1.pos, obj2.pos) < obj2.radius + obj1.radius){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        static checkBounds(pos, vel, axis, size){
+            if(pos + vel > axis + size / 2){
                 return 0;
             }
-            else if(pos + vel < 0 - radius / 2){
+            else if(pos + vel < 0 - size / 2){
                 return axis;
             }  
             else{
@@ -47,12 +62,12 @@ function createSpriteFactory(){
             return this.image_size[1];
         }
         
-        update_position(env, pos){
-            this.pos[0] = pos ? pos[0] : Sprite.update_dimension(this.pos[0], this.vel[0], env.canvas.width, this.image_size[0])
-            this.pos[1] = pos ? pos[1] : Sprite.update_dimension(this.pos[1], this.vel[1], env.canvas.height, this.image_size[1])
+        update_position(env, factor, pos){
+            this.pos[0] = pos ? pos[0] : Sprite.checkBounds(this.pos[0], this.vel[0] * factor, env.canvas.width, this.image_size[0])
+            this.pos[1] = pos ? pos[1] : Sprite.checkBounds(this.pos[1], this.vel[1] * factor, env.canvas.height, this.image_size[1])
         }
             
-        draw(canvas, env){
+        draw(canvas, env, factor){
             let img_ctr = this.image_center;
             let half_img_x = this.image_size[0] / 2
             let half_img_y = this.image_size[1] / 2
@@ -71,28 +86,28 @@ function createSpriteFactory(){
             
         }   
         
-        update(env){
-            this.update_position(env);
+        update(env, factor){
+            this.update_position(env, factor);
             this.age += 1;
             this.angle += Math.rad(this.angle_vel);
         }  
             
-        check_for_collision(objs1, objs2, objs2_to_remove){
-            objs1_to_remove = [];
+        check_for_collision(objs1, objs2, objs2_to_remove, game){
+            let objs1_to_remove = [];
             let len = objs1.length;
-            for(i = 0; i < len; i++){
-                if(collision_detect(objs1[i])){
-                    update_level();
-                    if(explosion_sound){
-                        explosion_sound.play();
+            for(let j = 0; j < len; j++){
+                if(Sprite.collision_detect(this, objs1[j])){
+                    game.state.update_level();
+                    if(this.sound){
+                        this.sound.play();
                     }
                     if(this.name === "Asteroid"){
-                        increment_score(50);
-                        info = rock_explosion_info;
-                        spawn_asteroid_debris(this.pos, this.vel);
-                        explosions.push(Sprite(this.pos, this.vel, 0, 0, rock_explosion_image, info));
+                        game.state.increment_score(50);
+                        let info = rock_explosion_info;
+                        //spawn_asteroid_debris(this.pos, this.vel);
+                        //explosions.push(Sprite(this.pos, this.vel, 0, 0, rock_explosion_image, info));
                     }else if(this.name == "Asteroid Debris"){
-                        increment_score(100);
+                        state.increment_score(100);
                         info = rock_debris_explosion_info;
                         explosions.push(Sprite(this.pos, this.vel, 0, 0, rock_debris_explosion_image, info));
                     }   
@@ -101,9 +116,8 @@ function createSpriteFactory(){
                         objs2_to_remove.push(this);
                     }
                 }
-                
             }
-            objs1 = objs1.diff(objs1_to_remove);
+           objs1 = objs1.diff(objs1_to_remove);
         }         
         
         check_expiry(){
@@ -132,6 +146,30 @@ function createSpriteFactory(){
             canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
             return;
             super.draw();
+        }
+
+
+        check_for_collision(objs, to_remove, game){
+            let explosion = self.game.sprite("Ship explosion")
+            let objs_to_remove = [];
+            for(let i = 0; i < len; i++){
+                if(this.collision_detect(self, obj)){
+                    game.state.lose_life()
+                    to_remove.add(self)
+                    if(this.sound){
+                        self.sound.pause()
+                        self.sound.rewind()
+                    }
+                    // if(explosion.sound){
+                    //     explosion.sound.play()
+                    // } 
+                    //game.add_sprite(Sprite(self.pos, self.vel, 0, 0, explosion.image, explosion.info, self.game, explosion.sound))
+                    if(objs.indexOf(obj) !== -1){
+                        objs_to_remove.push(obj);
+                    }
+                }  
+            }                
+            objs.difference_update(objs_to_remove)
         }
 
         thrusters_on(){

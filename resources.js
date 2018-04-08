@@ -162,6 +162,14 @@ function init_resources(){
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
         new Media(
+            "Baisc Space",
+            new ImageInfo("Nebula", "http://www.davewaters.ca/res/images/basic_space.jpg", [400, 300], [800, 600]),
+            null
+        )
+    )
+    // nebula images - nebula_brown.png, nebula_blue.png
+    game_resources.push(
+        new Media(
             "Blue Nebula",
             new ImageInfo("Nebula", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_blue.png", [400, 300], [800, 600]),
             null

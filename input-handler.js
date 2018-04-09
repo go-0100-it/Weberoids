@@ -7,7 +7,7 @@ function init_input_handler(game, environment){
         let pos = [];
         pos[0] = e.layerX ? e.layerX : e.offsetX;
         pos[1] = e.layerY ? e.layerY : e.offsetY;
-        let size = game.ship.image_size;
+        let size = game.ships[0].image_size;
         let center = environment.center;
         let in_x = inbounds(pos[0], center[0], size[0]);
         let in_y = inbounds(pos[1], center[1], size[1]);
@@ -29,7 +29,7 @@ function init_input_handler(game, environment){
     document.addEventListener('keyup', function(e){
         switch(e.key){
             case 'ArrowUp':
-                console.log("ArrowUp");
+                game.ships[0].thrusters_off();
                 break;
             case 'ArrowDown':
                 console.log("ArrowDown");
@@ -48,10 +48,10 @@ function init_input_handler(game, environment){
     document.addEventListener('keydown', function(e){
         switch(e.key){
             case 'ArrowUp':
-                console.log("ArrowUp");
+                game.ships[0].thrusters_on();
                 break;
             case 'ArrowDown':
-                console.log("ArrowDown");
+                
                 break;
             case 'ArrowRight':
                 console.log("ArrowRight");

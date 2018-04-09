@@ -1,7 +1,7 @@
-function init_game(resources, env, state){
+function init_game(resources, env, state, factory){
 
     class Game{
-        constructor(resources, env, state){
+        constructor(resources, env, state, factory){
             this.missiles = [];
             this.ships = [];
             this.asteroids = [];
@@ -9,11 +9,13 @@ function init_game(resources, env, state){
             this.explosions = [];
             this.time = 0;
             this.state = state;
+            this.spriteFactory = factory
+            this.resources = resources;
 
-            this.blueNebula = resources.spriteFactory.createStatic([0, 0], [0, 0], 0, 0, resources.getResource("Blue Nebula"));
-            this.ships.push(resources.spriteFactory.createShip([env.canvas.width / 2 , 0], [0, 0], 0, 0, resources.getResource("Basic ship")));
+            this.blueNebula = this.spriteFactory.createStatic([0, 0], [0, 0], 0, 0, resources.getResource("Blue Nebula"));
+            this.ships.push(this.spriteFactory.createShip([env.canvas.width / 2 , 0], [0, 0], 0, 0, resources.getResource("Basic ship")));
             this.ships[0].update_position(env.canvas, 0, [env.canvas.width / 2, env.canvas.height / 2]);
-            this.asteroids.push(resources.spriteFactory.createSpaceProjectile([0, 0], [2, 2], 0, 0, resources.getResource("Asteroid")));
+            this.asteroids.push(this.spriteFactory.createSpaceProjectile([0, 0], [4, 4], 0, 0, resources.getResource("Asteroid")));
         
         }
 
@@ -65,8 +67,8 @@ function init_game(resources, env, state){
             len = this.ships.length;
             for(let i = 0; i < len; i++){
                 this.ships[i].update(env, factor);
-                this.ships[i].check_for_collision(this.asteroids, this.ships_to_remove, this);
-                this.ships[i].check_for_collision(this.asteroid_debris, this.ships_to_remove, this);
+                this.asteroids = this.ships[i].check_for_collision(this.asteroids, this.ships_to_remove, this);
+                this.asteroid_debris = this.ships[i].check_for_collision(this.asteroid_debris, this.ships_to_remove, this);
                 this.ships[i].draw(canvas, env, factor);
             }    
             this.ships = this.ships.diff(this.ships_to_remove);
@@ -101,8 +103,9 @@ function init_game(resources, env, state){
                 this.explosions[i].update(env, factor);
                 this.explosions[i].draw(canvas, env, factor);
                 if(this.explosions[i].check_expiry()){
+                    console.log(this.explosions[i].image);
                     if(this.explosions[i].name == "Ship explosion"){
-                        reset_view();
+                        //reset_view();
                     }
                     this.explosions_to_remove.push(this.explosions[i]);
                 }     
@@ -154,5 +157,5 @@ function init_game(resources, env, state){
             }
         }
     }
-    return new Game(resources, env, state);
+    return new Game(resources, env, state, factory);
 }

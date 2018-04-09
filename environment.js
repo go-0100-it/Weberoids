@@ -1,17 +1,18 @@
 
-    function init_environment(resources, size, factory){
+    function init_environment(resources){
 
         class Enviornment{
-            constructor(resources, size){
+            constructor(resources, utils){
                 this.context = null;
                 this.canvas = null;
                 this.lastRender = 0;
                 this.progress = 0;
                 this.resources = resources;
                 this.center = null;
+                this.utils = utils;
             }
             create(tag, size, color){
-                let height = (window.innerHeight * 0.99);
+                
                 let body = document.getElementsByTagName("body")[0];
                 body.innerHTML = '<canvas id="canvas" width="' + size[0] + '" height="' + size[1] + '"></canvas>';
                 this.canvas = document.getElementById(tag);
@@ -21,10 +22,13 @@
             }
         }
 
-        let environment = new Enviornment(resources);
+        let utils = init_util();
+        let size = utils.calc_size();
+        let environment = new Enviornment(resources, utils);
+        let factory = createSpriteFactory();
         let canvas = environment.create("canvas", size, "black");
         let state = init_game_state();
-        let game = init_game(resources, environment);
+        let game = init_game(resources, environment, state, factory);
         let input = init_input_handler(game, environment);
 
         function loop(t){

@@ -1,7 +1,6 @@
 function init_resources(){
 
     let game_resources = []
-    let spriteFactory = createSpriteFactory();
 
     function getTotalImages(arr){
         cnt = 0
@@ -34,7 +33,7 @@ function init_resources(){
     // The callback that is executed when all the images have been loaded or not
     let allLoadedCallback = function(){
         console.log("GOOD NEWS, all images were successfully loaded");
-       init_main({getResource: getResource, game_resources: game_resources, spriteFactory: spriteFactory});
+       init_environment({getResource: getResource, game_resources: game_resources});
     };
 
     // The onload callback is triggered everytime an image is loaded
@@ -226,7 +225,7 @@ function init_resources(){
     game_resources.push(
         new Media(
             "Asteroid explosion",
-            new ImageInfo("Asteroid explosion", "http://www.davewaters.ca/res/images/rock_explode.png", [60, 60], [120, 120], 20, 24, true),
+            new ImageInfo("Asteroid explosion", "http://www.davewaters.ca/res/images/rock_explode.png", [60, 60], [120, 120], 20, 48, true),
             explosion_sound
         )
     )

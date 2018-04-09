@@ -47,8 +47,8 @@ function createSpriteFactory(){
 
         drawRotated(canvas, x, y, new_x, new_y){
             canvas.save();
-            canvas.translate(new_x / 2, new_y / 2);
-            canvas.rotate(Math.rad(this.angle));
+            canvas.translate(this.pos[0], this.pos[1]);
+            canvas.rotate(this.angle);
             canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
             canvas.restore();
         }

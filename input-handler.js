@@ -38,7 +38,7 @@ function init_input_handler(game, environment){
                 console.log("ArrowRight");
                 break;
             case 'ArrowLeft':
-                console.log("ArrowLeft");
+                game.ships[0].rotate(null);
                 break;
             default:
                 break;
@@ -54,10 +54,10 @@ function init_input_handler(game, environment){
                 
                 break;
             case 'ArrowRight':
-                console.log("ArrowRight");
+                game.ships[0].rotate("COUNTERCLOCKWISE");
                 break;
             case 'ArrowLeft':
-                console.log("ArrowLeft");
+                game.ships[0].rotate("CLOCKWISE");
                 break;
             default:
                 break;

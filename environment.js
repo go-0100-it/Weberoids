@@ -14,6 +14,7 @@
             create(tag, size, color){
                 
                 let body = document.getElementsByTagName("body")[0];
+                body.style.backgroundColor = "Darkgrey";
                 body.innerHTML = '<canvas id="canvas" width="' + size[0] + '" height="' + size[1] + '"></canvas>';
                 this.canvas = document.getElementById(tag);
                 this.context = this.canvas.getContext("2d");

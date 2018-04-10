@@ -24,7 +24,6 @@ function createSpriteFactory(){
 
         static collision_detect(obj1, obj2){
             if(Sprite.dist(obj1.pos, obj2.pos) < obj1.radius + obj2.radius){
-                console.log(Sprite.dist(obj1.pos, obj2.pos))
                 return true;
             }
             else{
@@ -46,11 +45,13 @@ function createSpriteFactory(){
         }
 
         drawRotated(canvas, x, y, new_x, new_y){
-            canvas.save();
-            canvas.translate(this.pos[0], this.pos[1]);
+            let rad = Math.rad(this.angle)
+            let pos = this.pos;
+            canvas.translate(pos[0], pos[1]);
             canvas.rotate(this.angle);
-            canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
-            canvas.restore();
+            canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], -this.image_center[0], -this.image_center[1], this.image_size[0], this.image_size[1]);
+            canvas.rotate(-this.angle);
+            canvas.translate(-pos[0], -pos[1]);
         }
 
         getWidth(){
@@ -72,7 +73,7 @@ function createSpriteFactory(){
             let half_img_x = this.image_size[0] / 2
             let half_img_y = this.image_size[1] / 2
             let x = img_ctr[0] - half_img_x;
-            let y = img_ctr[0] - half_img_y;
+            let y = img_ctr[1] - half_img_y;
             if(this.animated){
                 x = this.image_size[0] * this.age; 
             }else if(this.thrust){
@@ -92,7 +93,7 @@ function createSpriteFactory(){
         update(env, factor){
             this.update_position(env, factor);
             this.age += 1;
-            this.angle += Math.rad(this.angle_vel);
+            this.angle += Math.deg(this.angle_vel);
         }  
             
         check_for_collision(objs1, objs2, objs2_to_remove, game){
@@ -100,27 +101,28 @@ function createSpriteFactory(){
             let len = objs1.length;
             for(let i = 0; i < len; i++){
                 if(Sprite.collision_detect(this, objs1[i])){
+                    let explosionType = "";
                     game.state.update_level();
-                    if(this.sound){
-                        this.sound.play();
-                    }
                     if(this.name === "Asteroid"){
                         game.state.increment_score(50);
-                        let info = rock_explosion_info;
+                        explosionType = "Asteroid explosion";
                         //spawn_asteroid_debris(this.pos, this.vel);
-                        //explosions.push(Sprite(this.pos, this.vel, 0, 0, rock_explosion_image, info));
                     }else if(this.name == "Asteroid Debris"){
-                        state.increment_score(100);
-                        info = rock_debris_explosion_info;
-                        explosions.push(Sprite(this.pos, this.vel, 0, 0, rock_debris_explosion_image, info));
-                    }   
+                        game.state.increment_score(100);
+                        explosionType = "Asteroid debris explosion";
+                    }
+                    let explosion = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(explosionType));
+                    if(explosion.sound){
+                        explosion.sound.play();
+                    }
+                    game.explosions.push(explosion); 
                     objs1_to_remove.push(objs1[i]);
                     if(objs2.indexOf(this) !== -1){
                         objs2_to_remove.push(this);
                     }
                 }
             }
-           objs1 = objs1.diff(objs1_to_remove);
+           return objs1.diff(objs1_to_remove);
         }         
         
         check_expiry(){
@@ -149,6 +151,9 @@ function createSpriteFactory(){
                     to_remove.push(this);
                     if(explosion1.sound){
                         explosion1.sound.play();
+                    } 
+                    if(objs[i].sound){
+                        objs[i].sound.pause();
                     } 
                     objs_to_remove.push(objs[i]);
                 }  
@@ -192,14 +197,14 @@ function createSpriteFactory(){
             this.vel[1] = this.vel[1] * (1 - env.utils.const)
         }   
             
-        shoot(){
-            let pos_x = this.pos[0] + ((this.pos[0] + this.radius - this.pos[0]) * math.cos(this.angle)) + ((this.pos[1] - this.pos[1]) * math.sin(this.angle))
-            let pos_y = this.pos[1] + ((this.pos[1] - this.pos[1]) * math.cos(this.angle)) + ((this.pos[0] + this.radius - this.pos[0]) * math.sin(this.angle))
+        shoot(game){
+            let pos_x = this.pos[0] + ((this.pos[0] + this.radius - this.pos[0]) * Math.cos(this.angle)) + ((this.pos[1] - this.pos[1]) * Math.sin(this.angle))
+            let pos_y = this.pos[1] + ((this.pos[1] - this.pos[1]) * Math.cos(this.angle)) + ((this.pos[0] + this.radius - this.pos[0]) * Math.sin(this.angle))
             let pos = [pos_x, pos_y]
-            let forward = [math.cos(this.angle), math.sin(this.angle)]
+            let forward = [Math.cos(this.angle), Math.sin(this.angle)]
             let vel_x = this.vel[0] + forward[0]*10
             let vel_y = this.vel[1] + forward[1]*10
-            missiles.push(Sprite(pos, [vel_x, vel_y], this.angle, this.angle_vel, missile_image, missile_info, missile_sound))
+            game.missiles.push(game.spriteFactory.createExplosiveProjectile(pos, [vel_x, vel_y], 0, this.angle_vel, game.resources.getResource("Basic missile")));
         }    
         
         update_thrust(){

@@ -17,9 +17,12 @@ function init_input_handler(game, environment){
     });
 
     document.addEventListener('keypress', function(e){
+        let len = game.ships.length;
         switch(e.key){
             case ' ':
-                console.log("YOU GOT IT");
+                for(let i = 0; i < len > 0; i++){
+                    game.ships[i].shoot(game);
+                }
                 break;
             default:
                 break;
@@ -27,18 +30,21 @@ function init_input_handler(game, environment){
     });
 
     document.addEventListener('keyup', function(e){
+        let len = game.ships.length;
         switch(e.key){
             case 'ArrowUp':
-                game.ships[0].thrusters_off();
+                for(let i = 0; i < len > 0; i++){
+                    game.ships[i].thrusters_off();
+                }
                 break;
             case 'ArrowDown':
-                console.log("ArrowDown");
+                console.log("ArrowDown Release");
                 break;
             case 'ArrowRight':
-                console.log("ArrowRight");
-                break;
             case 'ArrowLeft':
-                game.ships[0].rotate(null);
+                for(let i = 0; i < len > 0; i++){
+                    game.ships[i].rotate(null);
+                }
                 break;
             default:
                 break;
@@ -46,18 +52,25 @@ function init_input_handler(game, environment){
     });
 
     document.addEventListener('keydown', function(e){
+        let len = game.ships.length;
         switch(e.key){
             case 'ArrowUp':
-                game.ships[0].thrusters_on();
+                for(let i = 0; i < len > 0; i++){
+                    game.ships[0].thrusters_on();
+                }
                 break;
             case 'ArrowDown':
-                
+                console.log("ArrowDown Depress");
                 break;
             case 'ArrowRight':
-                game.ships[0].rotate("COUNTERCLOCKWISE");
+                for(let i = 0; i < len > 0; i++){
+                    game.ships[i].rotate("CLOCKWISE");
+                }
                 break;
             case 'ArrowLeft':
-                game.ships[0].rotate("CLOCKWISE");
+                for(let i = 0; i < len > 0; i++){
+                    game.ships[0].rotate("COUNTERCLOCKWISE");
+                }
                 break;
             default:
                 break;

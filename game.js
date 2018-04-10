@@ -9,14 +9,16 @@ function init_game(resources, env, state, factory){
             this.explosions = [];
             this.time = 0;
             this.state = state;
-            this.spriteFactory = factory
+            this.spriteFactory = factory;
             this.resources = resources;
+            this.env = env;
+            this.spawn_interval = 2500;
+            this.spawn_timer = setInterval(this.spawner, (this.spawn_interval / this.state.level), this);
 
             this.blueNebula = this.spriteFactory.createStatic([0, 0], [0, 0], 0, 0, resources.getResource("Blue Nebula"));
             this.ships.push(this.spriteFactory.createShip([env.canvas.width / 2 , 0], [0, 0], 0, 0, resources.getResource("Basic ship")));
             this.ships[0].update_position(env.canvas, 0, [env.canvas.width / 2, env.canvas.height / 2]);
-            this.asteroids.push(this.spriteFactory.createSpaceProjectile([0, 0], [4, 4], 0, 0, resources.getResource("Asteroid")));
-        
+            this.asteroids.push(this.spriteFactory.createSpaceProjectile([0, 0], [4, 4], 0, 0.0005, resources.getResource("Asteroid")));
         }
 
         draw(env, factor, state){
@@ -29,7 +31,6 @@ function init_game(resources, env, state, factory){
         /// asteroid.update(env, factor);
 
             // animiate background
-
             
             /*=====================================================================================================
             TODO:
@@ -50,13 +51,13 @@ function init_game(resources, env, state, factory){
 
             // draw and update ships and sprites
             this.missiles_to_remove = [];
-            let len = this.missiles.lenght;
+            let len = this.missiles.length;
             for(let i = 0; i < len; i++){
                 this.missiles[i].update(env, factor);
                 this.missiles[i].draw(canvas, env, factor);
                 if(this.missiles[i].check_expiry()){
-                    if(this.missiles.indexOf(this.missiless[i] !== -1)){
-                        this.missiles_to_remove.push(this.missile[i]);
+                    if(this.missiles.indexOf(this.missiles[i] !== -1)){
+                        this.missiles_to_remove.push(this.missiles[i]);
                     }
                 }           
             }
@@ -80,7 +81,7 @@ function init_game(resources, env, state, factory){
             for(let i = 0; i < len; i++){
                 this.asteroids[i].update(env, factor);
                 this.asteroids[i].draw(canvas, env, factor);
-                this.asteroids[i].check_for_collision(this.missiles, this.asteroids, this.asteroids_to_remove, this);
+                this.missiles = this.asteroids[i].check_for_collision(this.missiles, this.asteroids, this.asteroids_to_remove, this);
             } 
             this.asteroids = this.asteroids.diff(this.asteroids_to_remove);
             
@@ -103,7 +104,6 @@ function init_game(resources, env, state, factory){
                 this.explosions[i].update(env, factor);
                 this.explosions[i].draw(canvas, env, factor);
                 if(this.explosions[i].check_expiry()){
-                    console.log(this.explosions[i].image);
                     if(this.explosions[i].name == "Ship explosion"){
                         //reset_view();
                     }
@@ -111,6 +111,46 @@ function init_game(resources, env, state, factory){
                 }     
             }
             this.explosions = this.explosions.diff(this.explosions_to_remove);
+        }
+
+        // timer handler that spawns a rock    
+        spawner(self){
+            if(self.asteroids.length < self.state.level + 2){
+                let org1 = Math.randInt(0, 3)
+                console.log(org1);
+                let rnd_pos_org = Math.randInt(self.env.canvas.width-30, self.env.canvas.width-20);
+                let rnd_neg_org = 20;
+                let rnd_pos_vel = Math.randInt(1, self.state.level + 1)
+                let rnd_neg_vel = -(Math.randInt(1, self.state.level + 1))
+                let origin = [];
+                let velocity = [];
+                if(org1 < 2){
+                    origin = [rnd_pos_org, 0];
+                    velocity = [rnd_neg_vel, 0];
+                    if(org1 === 0){
+                        origin[1] = rnd_pos_org;
+                        velocity[1] = rnd_neg_vel;
+                    }
+                    else{
+                        origin[1] = rnd_neg_org;
+                        velocity[1] = rnd_pos_vel;
+                    }  
+                } 
+                else{
+                    origin = [rnd_neg_org, 0];
+                    velocity = [rnd_pos_vel, 0];
+                    if(org1 === 2){
+                        origin[1] = rnd_pos_org;
+                        velocity[1] = rnd_neg_vel;
+                    }
+                    else{
+                        origin[1] = rnd_neg_org;
+                        velocity[1] = rnd_pos_vel;
+                    }  
+                }
+                let spin = (org1 + 1) / 5000;
+                self.asteroids.push(self.spriteFactory.createSpaceProjectile(origin, velocity, 0, spin, resources.getResource("Asteroid")));
+            }
         }
             
             // splash screen

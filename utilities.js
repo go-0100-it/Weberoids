@@ -1,8 +1,45 @@
 function init_util(){
 
+    /**
+     * Returns a random integer between `min` and `max`.
+     * 
+     * @param {number} min - min number
+     * @param {number} max - max number
+     * @return {number} a random integer
+     */
+    Math.randInt = function(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+
+    /**
+     * Returns a random floating point number between `min` and `max`.
+     * 
+     * @param {number} min - min number
+     * @param {number} max - max number
+     * @return {number} a random floating point number
+     */
+    Math.randFloat = function(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+
+    /**
+     * Returns a random boolean value.
+     * 
+     * @return {boolean} a random true/false
+     */
+    Math.randBool = function() {
+        return Math.random() >= 0.5;
+    }
+
+
+
     Array.prototype.diff = function(a){
         return this.filter(function(i) {return a.indexOf(i) < 0;});
     };
+
+
     //helper
     /**
      * converts degree to radians
@@ -13,12 +50,14 @@ function init_util(){
         return degree * (Math.PI / 180);
     };
 
+
+
     /**
      * Converts radian to degree
      * @param radians
      * @returns {number}
      */
-    Math.ang = function (radians) {
+    Math.deg = function (radians) {
         return radians * (180 / Math.PI);
     }
 

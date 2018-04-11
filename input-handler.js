@@ -34,7 +34,7 @@ function init_input_handler(game, environment){
         switch(e.key){
             case 'ArrowUp':
                 for(let i = 0; i < len > 0; i++){
-                    game.ships[i].thrusters_off();
+                    game.ships[i].thrustersOff();
                 }
                 break;
             case 'ArrowDown':
@@ -56,7 +56,7 @@ function init_input_handler(game, environment){
         switch(e.key){
             case 'ArrowUp':
                 for(let i = 0; i < len > 0; i++){
-                    game.ships[0].thrusters_on();
+                    game.ships[0].thrustersOn();
                 }
                 break;
             case 'ArrowDown':

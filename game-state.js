@@ -7,7 +7,26 @@ function init_game_state(){
             this.level = 1;
             this.lives = 3;
         }
-            
+
+        setLives(int){
+            this.lives = int;
+        }
+
+        getLives(){return this.lives;};
+
+        is_game_on(){return this.game_on;};
+
+        getLevel(){return this.level;};
+
+        getScore(){return this.score;};
+
+        setScore(int){
+            this.score = int;
+        }
+        
+        setLevel(int){
+            this.level = int;
+        }
             
         lose_life(){
             if(this.lives > 0){

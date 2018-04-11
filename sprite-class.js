@@ -44,13 +44,50 @@ function createSpriteFactory(){
             }    
         }
 
+        isAnimation(){return this.animated;};
+
+        getImage(){return this.image;};
+
+        getAge(){return this.age;};
+
+        increaseAge(int){
+            this.age += int;
+        };
+
+        getAngle(){return this.angle;};
+
+        increaseAng(float){
+            this.angle += float;
+        };
+
+        increaseAngVel(float){
+            this.angle_vel += float;
+        }
+
+        getAngVel(){return this.angle_vel;};
+
+        setAngVel(float){
+            this.angle_vel += float;
+        };
+
+        getPos(){return this.pos;};
+
+        getName(){return this.name;};
+
+        getImageSize(){return this.image_size;};
+
+        getImageCenter(){return this.image_center;};
+
         drawRotated(canvas, x, y, new_x, new_y){
-            let rad = Math.rad(this.angle)
-            let pos = this.pos;
+            let pos = this.getPos();
+            let size = this.getImageSize()
+            let ang = this.getAngle();
+            let rad = Math.rad(ang);
+            let ctr = this.getImageCenter();
             canvas.translate(pos[0], pos[1]);
-            canvas.rotate(this.angle);
-            canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], -this.image_center[0], -this.image_center[1], this.image_size[0], this.image_size[1]);
-            canvas.rotate(-this.angle);
+            canvas.rotate(ang);
+            canvas.drawImage(this.getImage(), x, y, size[0], size[1], -ctr[0], -ctr[1], size[0], size[1]);
+            canvas.rotate(-ang);
             canvas.translate(-pos[0], -pos[1]);
         }
 
@@ -63,53 +100,58 @@ function createSpriteFactory(){
         }
         
         update_position(env, factor, pos){
-            this.pos[0] = pos ? pos[0] : Sprite.checkBounds(this.pos[0], this.vel[0] * factor, env.canvas.width, this.image_size[0])
-            this.pos[1] = pos ? pos[1] : Sprite.checkBounds(this.pos[1], this.vel[1] * factor, env.canvas.height, this.image_size[1])
+            let width = env.getCanvasWidth();
+            let height = env.getCanvasHeight();
+            let size = this.getImageSize();
+            this.pos[0] = pos ? pos[0] : Sprite.checkBounds(this.pos[0], this.vel[0] * factor, width, size[0])
+            this.pos[1] = pos ? pos[1] : Sprite.checkBounds(this.pos[1], this.vel[1] * factor, height, size[1])
         }
             
         draw(canvas, env, factor){
-            let img_ctr = this.image_center;
-   
-            let half_img_x = this.image_size[0] / 2
-            let half_img_y = this.image_size[1] / 2
+            let CONST = env.getResources().CONST;
+            let img_ctr = this.getImageCenter();
+            let size = this.getImageSize();
+            let half_img_x = size[0] / 2
+            let half_img_y = size[1] / 2
             let x = img_ctr[0] - half_img_x;
             let y = img_ctr[1] - half_img_y;
-            if(this.animated){
-                x = this.image_size[0] * this.age; 
-            }else if(this.thrust){
-                x = this.image_size[0]; 
+            if(this.isAnimation()){
+                x = size[0] * this.getAge(); 
+            }else if(this.getName() === CONST.BASIC_SHIP && this.isThrusting()){
+                x = size[0]; 
                 this.update_thrust()
             }
             let new_x = this.pos[0] - half_img_x;
             let new_y = this.pos[1] - half_img_y;
-            if(this.angle !== 0){
+            if(this.getAngle() !== 0){
                 this.drawRotated(canvas, x, y, new_x, new_y)
             }else{
-                canvas.drawImage(this.image, x, y, this.image_size[0], this.image_size[1], new_x, new_y, this.image_size[0], this.image_size[1]);
+                canvas.drawImage(this.getImage(), x, y, size[0], size[1], new_x, new_y, size[0], size[1]);
             }
             
         }   
         
         update(env, factor){
             this.update_position(env, factor);
-            this.age += 1;
-            this.angle += Math.deg(this.angle_vel);
+            this.increaseAge(1);
+            this.increaseAng(Math.deg(this.getAngVel()));
         }  
             
         check_for_collision(objs1, objs2, objs2_to_remove, game){
+            let CONST = game.getResources().CONST;
             let objs1_to_remove = [];
             let len = objs1.length;
             for(let i = 0; i < len; i++){
                 if(Sprite.collision_detect(this, objs1[i])){
                     let explosionType = "";
                     game.state.update_level();
-                    if(this.name === "Asteroid"){
+                    if(this.name === CONST.ASTEROID){
                         game.state.increment_score(50);
-                        explosionType = "Asteroid explosion";
+                        explosionType = CONST.ASTEROID_EXPLOSION;
                         //spawn_asteroid_debris(this.pos, this.vel);
-                    }else if(this.name == "Asteroid Debris"){
+                    }else if(this.name === CONST.ASTEROID_DEBRIS){
                         game.state.increment_score(100);
-                        explosionType = "Asteroid debris explosion";
+                        explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
                     }
                     let explosion = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(explosionType));
                     if(explosion.sound){
@@ -139,12 +181,13 @@ function createSpriteFactory(){
 
     class Ship extends Sprite{
         check_for_collision(objs, to_remove, game){
-            let explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource("Ship explosion"));
+            let CONST = game.getResources().CONST;
+            let explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.SHIP_EXPLOSION));
             let objs_to_remove = [];
             let len = objs.length;
             for(let i = 0; i < len; i++){
                 if(Sprite.collision_detect(this, objs[i])){
-                    let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource("Asteroid explosion"));
+                    let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
                     game.explosions.push(explosion2);
                     game.explosions.push(explosion1);
                     game.state.lose_life();
@@ -162,21 +205,21 @@ function createSpriteFactory(){
             super.check_for_collision();
         }
 
-        thrusters_on(){
+        thrustersOn(){
             if(this.sound){
                 this.sound.play();
             } 
             this.thrust = true;
         }  
             
-        thrusters_off(){
+        thrustersOff(){
             if(this.sound){
                 this.sound.pause();
             } 
             this.thrust = false;
         }  
             
-        thrusting(){
+        isThrusting(){
             return this.thrust;
         }
             
@@ -198,13 +241,14 @@ function createSpriteFactory(){
         }   
             
         shoot(game){
+            let CONST = game.getResources().CONST;
             let pos_x = this.pos[0] + ((this.pos[0] + this.radius - this.pos[0]) * Math.cos(this.angle)) + ((this.pos[1] - this.pos[1]) * Math.sin(this.angle))
             let pos_y = this.pos[1] + ((this.pos[1] - this.pos[1]) * Math.cos(this.angle)) + ((this.pos[0] + this.radius - this.pos[0]) * Math.sin(this.angle))
             let pos = [pos_x, pos_y]
             let forward = [Math.cos(this.angle), Math.sin(this.angle)]
             let vel_x = this.vel[0] + forward[0]*10
             let vel_y = this.vel[1] + forward[1]*10
-            game.missiles.push(game.spriteFactory.createExplosiveProjectile(pos, [vel_x, vel_y], 0, this.angle_vel, game.resources.getResource("Basic missile")));
+            game.missiles.push(game.spriteFactory.createExplosiveProjectile(pos, [vel_x, vel_y], 0, this.angle_vel, game.resources.getResource(CONST.BASIC_MISSILE)));
         }    
         
         update_thrust(){

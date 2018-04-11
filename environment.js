@@ -12,7 +12,6 @@
                 this.utils = utils;
             }
             create(tag, size, color){
-                
                 let body = document.getElementsByTagName("body")[0];
                 body.style.backgroundColor = "Darkgrey";
                 body.innerHTML = '<canvas id="canvas" width="' + size[0] + '" height="' + size[1] + '"></canvas>';
@@ -21,6 +20,18 @@
                 this.center = [this.canvas.width / 2, this.canvas.height / 2];
                 return this.context;
             }
+
+            getContext(){return this.context;};
+
+            getCanvasWidth(){return this.canvas.width;};
+
+            getCanvasHeight(){return this.canvas.height;};
+
+            getCanvasCenter(){return this.center;};
+
+            getResources(){return this.resources;};
+
+            getUtils(){return this.utils;};
         }
 
         let utils = init_util();

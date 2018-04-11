@@ -33,7 +33,7 @@ function init_resources(){
     // The callback that is executed when all the images have been loaded or not
     let allLoadedCallback = function(){
         console.log("GOOD NEWS, all images were successfully loaded");
-       init_environment({getResource: getResource, game_resources: game_resources});
+       init_environment({getResource: getResource, CONST: CONST});
     };
 
     // The onload callback is triggered everytime an image is loaded
@@ -63,6 +63,26 @@ function init_resources(){
         }
     };
 
+    class Constants{
+        constructor(){
+            this.SOUND_TRACK = "Sound track";
+            this.SPALSH = "Splash";
+            this.DEBRIS = "Debris";
+            this.BASIC_SHIP = "Basic ship";
+            this.BASIC_MISSILE = "Basic missile";
+            this.BASIC_SPACE = "Basic space";
+            this.BLUE_NEBULA = "Blue Nebula";
+            this.BROWN_NEBULA = "Brown Nebula";
+            this.ASTEROID = "Asteroid";
+            this.ASTEROID_DEBRIS = "Astroid debris";
+            this.ASTEROID_EXPLOSION = "Asteroid explosion";
+            this.ASTEROID_DEBRIS_EXPLOSION = "Asteroid debris explosion";
+            this.SHIP_EXPLOSION = "Ship explosion";
+        }
+    }
+
+    let CONST = new Constants();
+
     class Media{
         constructor(name, info, soundUrl){
             this.name = name;
@@ -73,10 +93,22 @@ function init_resources(){
             this.img_loaded = false;
             this.sound_loaded = false;
         }
+
+        setSound(sound){this.sound = sound;};
+
+        getName(){return this.name;};
+
+        getInfo(){return this.info;};
+
+        getImage(){return this.image;};
+
+        getSound(){return this.sound;}
+
+        getSoundUrl(){return this.soundUrl;};
         
         loadImage(){
             if(this.info !== null && this.info.src !== null){
-                let src = this.info.src;
+                let src = this.getInfo().src;
                 this.image = new Image();
                 this.image.onload = onloadCallback;
                 this.image.onerror = onerrorCallback;
@@ -85,9 +117,9 @@ function init_resources(){
         }
 
         loadSound(){
-            if(this.soundUrl !== null){
+            if(this.getSoundUrl !== null){
                 let src = this.soundUrl;
-                this.sound = new Audio(this.soundUrl);
+                this.setSound(new Audio(this.getSoundUrl()));
             }
         }
 
@@ -144,7 +176,7 @@ function init_resources(){
     // sound assets purchased from sounddogs.com, please do not redistribute
     game_resources.push(
         new Media(
-            "Sound track",
+            CONST.SOUND_TRACK,
             null,
             "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
         )
@@ -153,93 +185,93 @@ function init_resources(){
     //                 debris1_blue.png, debris2_blue.png, debris3_blue.png, debris4_blue.png, debris_blend.png
     game_resources.push(
         new Media(
-            "Debris",
-            new ImageInfo("Debris", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/debris2_blue.png", [320, 240], [640, 480]),
+            CONST.DEBRIS,
+            new ImageInfo(CONST.DEBRIS, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/debris2_blue.png", [320, 240], [640, 480]),
             null
         ) 
     )
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
         new Media(
-            "Baisc Space",
-            new ImageInfo("Nebula", "http://www.davewaters.ca/res/images/basic_space.jpg", [400, 300], [800, 600]),
+            CONST.BASIC_SPACE,
+            new ImageInfo(CONST.BASIC_SPACE, "http://www.davewaters.ca/res/images/basic_space.jpg", [400, 300], [800, 600]),
             null
         )
     )
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
         new Media(
-            "Blue Nebula",
-            new ImageInfo("Nebula", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_blue.png", [400, 300], [800, 600]),
+            CONST.BLUE_NEBULA,
+            new ImageInfo(CONST.BLUE_NEBULA, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_blue.png", [400, 300], [800, 600]),
             null
         )
     )
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
         new Media(
-            "Brown Nebula",
-            new ImageInfo("Nebula", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_brown.png", [400, 300], [800, 600]),
+            CONST.BROWN_NEBULA,
+            new ImageInfo(CONST.BROWN_NEBULA, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_brown.png", [400, 300], [800, 600]),
             null
         )
     )
     // splash image
     game_resources.push(
         new Media(
-            "Splash",
-            new ImageInfo("Splash", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/splash.png", [200, 150], [400, 300]),
+            CONST.SPLASH,
+            new ImageInfo(CONST.SPLASH, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/splash.png", [200, 150], [400, 300]),
             null
         )
     )
     // ship image
     game_resources.push(
         new Media(
-            "Basic ship",
-            new ImageInfo("Basic ship", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/double_ship.png", [45, 45], [90, 90], 35),
+            CONST.BASIC_SHIP,
+            new ImageInfo(CONST.BASIC_SHIP, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/double_ship.png", [45, 45], [90, 90], 35),
             "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.mp3"
         )
     )
     // missile image - shot1.png, shot2.png, shot3.png
     game_resources.push(
         new Media(
-            "Basic missile",
-            new ImageInfo("Basic missile", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/shot2.png", [5,5], [10, 10], 4, 50),
+            CONST.BASIC_MISSILE,
+            new ImageInfo(CONST.BASIC_MISSILE, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/shot2.png", [5,5], [10, 10], 4, 50),
             "http://www.davewaters.ca/res/sounds/laser.mp3"
         )
     )
     // asteroid images - asteroid_blue.png, asteroid_brown.png, asteroid_blend.png
     game_resources.push(
         new Media(
-            "Asteroid",
-            new ImageInfo("Asteroid", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/asteroid_blue.png", [45, 45], [90, 90], 40),
+            CONST.ASTEROID,
+            new ImageInfo(CONST.ASTEROID, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/asteroid_blue.png", [45, 45], [90, 90], 40),
             null
         )
     )
     game_resources.push(
         new Media(
-            "Asteroid debris",
-            new ImageInfo("Asteroid debris", "http://davewaters.ca/res/images/asteroid_chunk.png", [22.5, 22.5], [45, 45], 20),
+            CONST.ASTEROID_DEBRIS,
+            new ImageInfo(CONST.ASTEROID_DEBRIS, "http://davewaters.ca/res/images/asteroid_chunk.png", [22.5, 22.5], [45, 45], 20),
             null
         )
     )
     // animated explosion - explosion_orange.png, explosion_blue.png, explosion_blue2.png, explosion_alpha.png
     game_resources.push(
         new Media(
-            "Asteroid explosion",
-            new ImageInfo("Asteroid explosion", "http://www.davewaters.ca/res/images/rock_explode.png", [60, 60], [120, 120], 20, 48, true),
+            CONST.ASTEROID_EXPLOSION,
+            new ImageInfo(CONST.ASTEROID_EXPLOSION, "http://www.davewaters.ca/res/images/rock_explode.png", [60, 60], [120, 120], 20, 48, true),
             explosion_sound
         )
     )
     game_resources.push(
         new Media(
-            "Asteroid debris explosion",
-            new ImageInfo("Asteroid debris explosion", "http://www.davewaters.ca/res/images/asteroid_debris_explode.png", [30, 30], [60, 60], 10, 24, true),
+            CONST.ASTEROID_DEBRIS_EXPLOSION,
+            new ImageInfo(CONST.ASTEROID_DEBRIS_EXPLOSION, "http://www.davewaters.ca/res/images/asteroid_debris_explode.png", [30, 30], [60, 60], 10, 24, true),
             explosion_sound
         )
     )
     game_resources.push(
         new Media(
-            "Ship explosion",
-            new ImageInfo("Ship explosion", "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/explosion_alpha.png", [64, 64], [128, 128], 17, 24, true),
+            CONST.SHIP_EXPLOSION,
+            new ImageInfo(CONST.SHIP_EXPLOSION, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/explosion_alpha.png", [64, 64], [128, 128], 17, 24, true),
             explosion_sound
         )
     )

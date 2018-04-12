@@ -20,7 +20,7 @@ function createSpriteFactory(){
         static dist(p,q){
             return Math.sqrt((p[0] - q[0]) ** 2+(p[1] - q[1]) ** 2)
         }
-            
+        
 
         static collision_detect(obj1, obj2){
             if(Sprite.dist(obj1.pos, obj2.pos) < obj1.radius + obj2.radius){
@@ -143,21 +143,21 @@ function createSpriteFactory(){
             let len = objs1.length;
             for(let i = 0; i < len; i++){
                 if(Sprite.collision_detect(this, objs1[i])){
-                    let explosionType = "";
+                    let explosionType = null;
+                    let explosion = null;
                     game.state.update_level();
                     if(this.name === CONST.ASTEROID){
                         game.state.increment_score(50);
                         explosionType = CONST.ASTEROID_EXPLOSION;
-                        //spawn_asteroid_debris(this.pos, this.vel);
+                        game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
                     }else if(this.name === CONST.ASTEROID_DEBRIS){
                         game.state.increment_score(100);
                         explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
                     }
-                    let explosion = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(explosionType));
+                    explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
                     if(explosion.sound){
                         explosion.sound.play();
                     }
-                    game.explosions.push(explosion); 
                     objs1_to_remove.push(objs1[i]);
                     if(objs2.indexOf(this) !== -1){
                         objs2_to_remove.push(this);
@@ -248,7 +248,7 @@ function createSpriteFactory(){
             let forward = [Math.cos(this.angle), Math.sin(this.angle)]
             let vel_x = this.vel[0] + forward[0]*10
             let vel_y = this.vel[1] + forward[1]*10
-            game.missiles.push(game.spriteFactory.createExplosiveProjectile(pos, [vel_x, vel_y], 0, this.angle_vel, game.resources.getResource(CONST.BASIC_MISSILE)));
+            game.addExplosiveProjectile(CONST.BASIC_MISSILE, pos, [vel_x, vel_y], 0, this.angle_vel);
         }    
         
         update_thrust(){
@@ -276,8 +276,19 @@ function createSpriteFactory(){
     class SpaceProjectile extends Sprite{}
 
     class Static extends Sprite{
-        draw(canvas, env){
-            canvas.drawImage(this.image, 0, 0, this.image_size[0], this.image_size[1], 0, 0, env.canvas.width, env.canvas.height);
+        draw(canvas, env, orig_size){
+            let center = env.getCanvasCenter();
+            let x_pos = 0;
+            let y_pos = 0;
+            let x_size = env.getCanvasWidth();
+            let y_size = env.getCanvasHeight();
+            if(orig_size){
+                x_pos = center[0] - this.image_size[0]/2;
+                y_pos = center[1] - this.image_size[1]/2;
+                x_size = this.image_size[0];
+                y_size = this.image_size[1];
+            }
+            canvas.drawImage(this.image, 0, 0, this.image_size[0], this.image_size[1], x_pos, y_pos, x_size, y_size);
             return;
             super.draw();
         }   

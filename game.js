@@ -13,15 +13,21 @@ function init_game(resources, env, state, factory){
             this.resources = resources;
             this.env = env;
             this.spawn_interval = 2500;
-            this.spawn_timer = setInterval(this.spawner, (this.spawn_interval / this.state.level), this);
-
-            this.blueNebula = this.spriteFactory.createStatic([0, 0], [0, 0], 0, 0, resources.getResource("Blue Nebula"));
-            this.ships.push(this.spriteFactory.createShip([env.canvas.width / 2 , 0], [0, 0], 0, 0, resources.getResource("Basic ship")));
-            this.ships[0].update_position(env, 0, [env.canvas.width / 2, env.canvas.height / 2]);
-            this.asteroids.push(this.spriteFactory.createSpaceProjectile([0, 0], [4, 4], 0, 0.0005, resources.getResource("Asteroid")));
+            this.spawn_timer = null
+            this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
+            this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
         }
 
-        getAllMissiles(){return this.missiles;}
+        startSpawning(){
+            this.spawn_timer = setInterval(this.spawner, (this.spawn_interval / this.state.level), this);
+        };
+
+        stopSpawning(){
+            clearInterval(this.spawn_timer);
+            this.spawn_timer = null;
+        };
+
+        getAllMissiles(){return this.missiles;};
 
         getShips(){return this.ships;};
 
@@ -57,37 +63,65 @@ function init_game(resources, env, state, factory){
 
         addSpaceProjectile(type, pos, vel, ang, ang_vel){
             let CONST = this.resources.CONST;
-            let sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
             switch(type){
                 case CONST.ASTEROID_DEBRIS:
-                    this.asteroid_debris.push(sprite);
+                    this.addMultiple(type, pos, vel);
                     break;
                 case CONST.ASTEROID:
-                    this.asteroids.push(sprite);
+                    this.asteroids.push(this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type)));
                     break;
                 default:
                     break;
             }
         };
 
-        createExplosiveProjectile(type, pos, vel, ang, ang_vel){
+        addStaticSprite(type, pos, vel, ang, ang_vel){
+            return this.spriteFactory.createStatic(pos, vel, ang, ang_vel, resources.getResource(type));
+        }
+
+        addExplosiveProjectile(type, pos, vel, ang, ang_vel){
             let CONST = this.resources.CONST;
             let sprite = this.spriteFactory.createExplosiveProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
             switch(type){
                 case CONST.BASIC_MISSILE:
-                    this.asteroids.push(sprite);
+                    this.missiles.push(sprite);
                     break;
                 default:
                     break;
             }
+            return sprite;
         }
+
+        addExplosion(type, pos, vel, ang, ang_vel){
+            let CONST = this.resources.CONST;
+            let sprite = this.spriteFactory.createExplosion(pos, vel, ang, ang_vel, this.resources.getResource(type));
+            this.explosions.push(sprite);
+            return sprite;
+        }
+
+        addMultiple(type, pos, vel){
+            let CONST = this.resources.CONST;
+            let vel_1 = this.env.utils.relativeVelocity(this.state.getLevel(), vel);
+            let vel_2 = this.env.utils.relativeVelocity(this.state.getLevel(), vel);
+            if(vel_1[0] === vel_2[0] && vel_1[1] === vel_2[1]){
+                vel_1[0] += 1;
+            }
+            let media = this.resources.getResource(type)
+            this.asteroid_debris.push(this.spriteFactory.createSpaceProjectile(pos, vel_1, 0, 0, media));
+            this.asteroid_debris.push(this.spriteFactory.createSpaceProjectile(pos, vel_2, 0, 0, media));
+        }
+        
 
         draw(env, factor, state){
             let canvas = env.getContext();
             let CONST = env.getResources().CONST;
             // should be calling ship.update(); and ship.draw(); methods here.
             // Also ship.check_for_collisions();
-            this.blueNebula.draw(canvas, env, factor);
+            this.blueNebula.draw(canvas, env);
+            if(!this.is_game_on()){
+                this.splash.draw(canvas, env, true);
+            }
+           
             //ship.draw(canvas, env, factor);
             //asteroid.draw(canvas, env, factor);
         /// asteroid.update(env, factor);
@@ -154,7 +188,7 @@ function init_game(resources, env, state, factory){
             for(let i = 0; i < len; i++){
                 this.asteroid_debris[i].update(env, factor);
                 this.asteroid_debris[i].draw(canvas, env, factor);
-                this.asteroid_debris[i].check_for_collision(this.missiles, this.asteroid_debris, asteroid_debris_to_remove, this);
+                this.missiles = this.asteroid_debris[i].check_for_collision(this.missiles, this.asteroid_debris, asteroid_debris_to_remove, this);
             }            
             this.asteroid_debris = this.asteroid_debris.diff(asteroid_debris_to_remove);
             
@@ -178,7 +212,7 @@ function init_game(resources, env, state, factory){
         // timer handler that spawns a rock    
         spawner(self){
             let CONST = self.env.getResources().CONST;
-            if(self.asteroids.length < self.state.level + 2){
+            if(self.asteroids.length < self.state.level + 1){
                 let org1 = Math.randInt(0, 3)
                 let width = self.getEnvironment().getCanvasWidth();
                 let level = self.getState().getLevel();
@@ -231,10 +265,11 @@ function init_game(resources, env, state, factory){
         start(){
             this.gameOn();
             this.reset_view();
-            this.setScore(0);
-            this.setLevel(1);
-            this.setLives(3);
-            this.game.spawn_timer.start();
+            this.state.setScore(0);
+            this.state.setLevel(1);
+            this.state.setLives(3);
+            this.startSpawning();
+            this.addShip("Basic ship", [env.canvas.getWidth() / 2, env.canvas.getHeight() / 2], [0, 0], 0, 0);
         }
 
         gameContext(){

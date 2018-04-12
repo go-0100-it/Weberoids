@@ -79,6 +79,19 @@ function init_util(){
             }
             return [width, height];
         };
+
+        relativeVelocity(level, vel){
+            let diff_1 = Math.randInt(0, level + 1);
+            let diff_2 =  Math.randInt(0, level + 1);
+            if(vel[0] < 0){
+                diff_1 = -(diff_1);
+            }  
+            if(vel[1] < 0){
+                diff_2 = -(diff_2)
+            }
+            console.log([vel[0] + diff_1, vel[1] + diff_2]);
+            return [vel[0] + diff_1, vel[1] + diff_2];
+        };
     }
 
     return new Utilities();

@@ -269,7 +269,6 @@ function init_game(resources, env, state, factory){
             this.state.setLevel(1);
             this.state.setLives(3);
             this.startSpawning();
-            this.addShip("Basic ship", [env.canvas.getWidth() / 2, env.canvas.getHeight() / 2], [0, 0], 0, 0);
         }
 
         gameContext(){
@@ -277,7 +276,7 @@ function init_game(resources, env, state, factory){
         }
 
         pause(){
-        }
+        } 
 
         end(){
             this.gameOff();

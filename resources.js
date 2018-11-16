@@ -84,71 +84,7 @@ function init_resources(){
 
     let CONST = new Constants();
 
-    class Media{
-        constructor(name, info, soundUrl){
-            this.name = name;
-            this.info = info;
-            this.image = null;
-            this.sound = null;
-            this.soundUrl = soundUrl;
-            this.img_loaded = false;
-            this.sound_loaded = false;
-        }
-
-        setSound(sound){this.sound = sound;};
-
-        getName(){return this.name;};
-
-        getInfo(){return this.info;};
-
-        getImage(){return this.image;};
-
-        getSound(){return this.sound;}
-
-        getSoundUrl(){return this.soundUrl;};
-        
-        loadImage(){
-            if(this.info !== null && this.info.src !== null){
-                let src = this.getInfo().src;
-                this.image = new Image();
-                this.image.onload = onloadCallback;
-                this.image.onerror = onerrorCallback;
-                this.image.src = src;
-            } 
-        }
-
-        // audioSupport() {
-        //     var a = document.createElement('audio');
-        //     var ogg = !!(a.canPlayType && a.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''));
-        //     if (ogg) return 'ogg';
-        //     var mp3 = !!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
-        //     if (mp3) return 'mp3';
-        //     else return 0;
-        // } 
-
-        loadAudio(url, vol){
-            let audio = new Audio();
-            audio.src = url;
-            audio.preload = "auto";
-            audio.volume = vol;
-            return audio;
-        }
-
-        loadSound(vol = 1){
-            if(this.getSoundUrl() !== null){
-                this.setSound(this.loadAudio(this.getSoundUrl(), vol));
-                this.sound.addEventListener('canplaythrough', this.soundLoaded, false);
-            }
-        }
-
-        imgWidth(){
-            return this.info.get_size()[0];
-        }
-
-        imgHeight(){
-            return this.info.get_size()[1];
-        }
-    }
+    
        
 
     class ImageInfo{
@@ -193,7 +129,7 @@ function init_resources(){
     
     // sound assets purchased from sounddogs.com, please do not redistribute
     game_resources.push(
-        new Media(
+        media(
             CONST.SOUND_TRACK,
             null,
             //"http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
@@ -204,7 +140,7 @@ function init_resources(){
     // debris images - debris1_brown.png, debris2_brown.png, debris3_brown.png, debris4_brown.png
     //                 debris1_blue.png, debris2_blue.png, debris3_blue.png, debris4_blue.png, debris_blend.png
     game_resources.push(
-        new Media(
+        media(
             CONST.DEBRIS,
             new ImageInfo(CONST.DEBRIS, "http://www.davewaters.ca/res/images/debris2_blue.png", [320, 240], [640, 480]),
             null
@@ -212,7 +148,7 @@ function init_resources(){
     )
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
-        new Media(
+        media(
             CONST.BASIC_SPACE,
             new ImageInfo(CONST.BASIC_SPACE, "http://www.davewaters.ca/res/images/basic_space.jpg", [400, 300], [800, 600]),
             null
@@ -220,7 +156,7 @@ function init_resources(){
     )
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
-        new Media(
+        media(
             CONST.BLUE_NEBULA,
             new ImageInfo(CONST.BLUE_NEBULA, "http://www.davewaters.ca/res/images/nebula_blue.png", [400, 300], [800, 600]),
             null
@@ -228,7 +164,7 @@ function init_resources(){
     )
     // nebula images - nebula_brown.png, nebula_blue.png
     game_resources.push(
-        new Media(
+        media(
             CONST.BROWN_NEBULA,
             new ImageInfo(CONST.BROWN_NEBULA, "http://davewaters.ca/res/images/nebula_brown.png", [400, 300], [800, 600]),
             null
@@ -236,7 +172,7 @@ function init_resources(){
     )
     // splash image
     game_resources.push(
-        new Media(
+        media(
             CONST.SPLASH,
             new ImageInfo(CONST.SPLASH, "http://davewaters.ca/res/images/splash.png", [200, 150], [400, 300]),
             null
@@ -244,7 +180,7 @@ function init_resources(){
     )
     // paused message image
     game_resources.push(
-        new Media(
+        media(
             CONST.PAUSED,
             new ImageInfo(CONST.PAUSED, "http://davewaters.ca/res/images/paused.png", [200, 40], [400, 80]),
             null
@@ -252,7 +188,7 @@ function init_resources(){
     )
     // ship image
     game_resources.push(
-        new Media(
+        media(
             CONST.BASIC_SHIP,
             new ImageInfo(CONST.BASIC_SHIP, "http://davewaters.ca/res/images/double_ship.png", [45, 45], [90, 90], 35),
             "http://davewaters.ca/res/sounds/thrust.mp3"
@@ -260,7 +196,7 @@ function init_resources(){
     )
     // missile image - shot1.png, shot2.png, shot3.png
     game_resources.push(
-        new Media(
+        media(
             CONST.BASIC_MISSILE,
             new ImageInfo(CONST.BASIC_MISSILE, "http://davewaters.ca/res/images/shot2.png", [5,5], [10, 10], 4, 60),
             "http://www.davewaters.ca/res/sounds/laser.mp3"
@@ -268,14 +204,14 @@ function init_resources(){
     )
     // asteroid images - asteroid_blue.png, asteroid_brown.png, asteroid_blend.png
     game_resources.push(
-        new Media(
+        media(
             CONST.ASTEROID,
             new ImageInfo(CONST.ASTEROID, "http://davewaters.ca/res/images/asteroid_blue.png", [45, 45], [90, 90], 40),
             null
         )
     )
     game_resources.push(
-        new Media(
+        media(
             CONST.ASTEROID_DEBRIS,
             new ImageInfo(CONST.ASTEROID_DEBRIS, "http://davewaters.ca/res/images/asteroid_chunk.png", [22.5, 22.5], [45, 45], 20),
             null
@@ -283,21 +219,21 @@ function init_resources(){
     )
     // animated explosion - explosion_orange.png, explosion_blue.png, explosion_blue2.png, explosion_alpha.png
     game_resources.push(
-        new Media(
+        media(
             CONST.ASTEROID_EXPLOSION,
             new ImageInfo(CONST.ASTEROID_EXPLOSION, "http://www.davewaters.ca/res/images/rock_explode.png", [60, 60], [120, 120], 20, 48, true),
             explosion_sound
         )
     )
     game_resources.push(
-        new Media(
+        media(
             CONST.ASTEROID_DEBRIS_EXPLOSION,
             new ImageInfo(CONST.ASTEROID_DEBRIS_EXPLOSION, "http://www.davewaters.ca/res/images/asteroid_debris_explode.png", [30, 30], [60, 60], 10, 24, true),
             explosion_sound
         )
     )
     game_resources.push(
-        new Media(
+        media(
             CONST.SHIP_EXPLOSION,
             new ImageInfo(CONST.SHIP_EXPLOSION, "http://www.davewaters.ca/res/images/explosion_alpha.png", [64, 64], [128, 128], 17, 24, true),
             "http://www.davewaters.ca/res/sounds/ship_explosion.mp3"

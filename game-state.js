@@ -39,9 +39,6 @@ function init_game_state(){
         lose_life(){
             if(this.lives > 0){
                 this.lives -= 1;
-                console.log("SCORE: " + this.score);
-            }else{
-                console.log("GAME OVER");
             }
         }
 

@@ -14,12 +14,13 @@ function init_game(resources, env, state, factory){
             this.env = env;
             this.spawn_interval = 2500;
             this.spawn_timer = null
-            this.soundClones = [];
+            this.paused = false;
             this.soundTrack = resources.getResource("Sound track").sound;
             this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
             this.debris = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
             //this.backgroundDebris = this.spriteFactory.createBackgroundProjectile([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
             this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
+            this.pausedMessage = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.PAUSED));
         }
 
         startSpawning(){
@@ -131,11 +132,12 @@ function init_game(resources, env, state, factory){
         
 
         draw(env, factor){
-            this.state.increment_time();
             let canvas = env.getContext();
             let CONST = env.getResources().CONST;
             this.blueNebula.draw(canvas, env);
-            this.state.time += 1;
+            if(!this.paused){
+                this.state.increment_time();
+            }
             let t = (this.state.time / 4) % env.getCanvasWidth();
             this.debris.draw(canvas, env, false, t);
             this.debris.draw(canvas, env, false, t);
@@ -152,7 +154,9 @@ function init_game(resources, env, state, factory){
             let missiles_to_remove = [];
             let len = this.missiles.length;
             for(let i = 0; i < len; i++){
-                this.missiles[i].update(env, factor);
+                if(!this.paused){
+                    this.missiles[i].update(env, factor);
+                }
                 this.missiles[i].draw(canvas, env, factor);
                 if(this.missiles[i].check_expiry()){
                     if(this.missiles.indexOf(this.missiles[i] !== -1)){
@@ -166,7 +170,9 @@ function init_game(resources, env, state, factory){
             let ships_to_remove = [];
             len = this.ships.length;
             for(let i = 0; i < len; i++){
-                this.ships[i].update(env, factor);
+                if(!this.paused){
+                    this.ships[i].update(env, factor);
+                }
                 this.asteroids = this.ships[i].check_for_collision(this.asteroids, ships_to_remove, this);
                 this.asteroid_debris = this.ships[i].check_for_collision(this.asteroid_debris, ships_to_remove, this);
                 this.ships[i].draw(canvas, env, factor);
@@ -178,7 +184,9 @@ function init_game(resources, env, state, factory){
             let asteroids_to_remove = [];
             len = this.asteroids.length;
             for(let i = 0; i < len; i++){
-                this.asteroids[i].update(env, factor);
+                if(!this.paused){
+                    this.asteroids[i].update(env, factor);
+                }
                 this.asteroids[i].draw(canvas, env, factor);
                 this.missiles = this.asteroids[i].check_for_collision(this.missiles, this.asteroids, asteroids_to_remove, this);
             } 
@@ -189,7 +197,9 @@ function init_game(resources, env, state, factory){
             let asteroid_debris_to_remove = [];
             len = this.asteroid_debris.length;
             for(let i = 0; i < len; i++){
-                this.asteroid_debris[i].update(env, factor);
+                if(!this.paused){
+                    this.asteroid_debris[i].update(env, factor);
+                }
                 this.asteroid_debris[i].draw(canvas, env, factor);
                 this.missiles = this.asteroid_debris[i].check_for_collision(this.missiles, this.asteroid_debris, asteroid_debris_to_remove, this);
             }            
@@ -200,7 +210,9 @@ function init_game(resources, env, state, factory){
             let explosions_to_remove = [];
             len = this.explosions.length;
             for(let i = 0; i < len; i++){
-                this.explosions[i].update(env, factor);
+                if(!this.paused){
+                    this.explosions[i].update(env, factor);
+                }
                 this.explosions[i].draw(canvas, env, factor);
                 if(this.explosions[i].check_expiry()){
                     if(this.explosions[i].getName() == CONST.SHIP_EXPLOSION){
@@ -213,14 +225,17 @@ function init_game(resources, env, state, factory){
                     explosions_to_remove.push(this.explosions[i]);
                 }     
             }
-            this.explosions = this.explosions.diff(explosions_to_remove);
+            this.explosions = this.explosions.diff(explosions_to_remove);   
 
             this.state.drawStateDetails(canvas);
 
             if(!this.is_game_on()){
                 this.splash.draw(canvas, env, true);
+            }else if(this.paused){
+                this.pausedMessage.draw(canvas, env, true);
             }
-        }   
+        }
+            
 
         // timer handler that spawns a rock    
         spawner(self){
@@ -292,6 +307,7 @@ function init_game(resources, env, state, factory){
         }
 
         pause(){
+            this.paused = !this.paused;
         } 
 
         end(){

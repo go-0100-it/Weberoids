@@ -67,6 +67,7 @@ function init_resources(){
         constructor(){
             this.SOUND_TRACK = "Sound track";
             this.SPALSH = "Splash";
+            this.PAUSED = "Paused message";
             this.DEBRIS = "Debris";
             this.BASIC_SHIP = "Basic ship";
             this.BASIC_MISSILE = "Basic missile";
@@ -131,10 +132,6 @@ function init_resources(){
             audio.preload = "auto";
             audio.volume = vol;
             return audio;
-        }
-
-        soundLoaded(e){
-           console.dir(e.path[0].src);
         }
 
         loadSound(vol = 1){
@@ -242,6 +239,14 @@ function init_resources(){
         new Media(
             CONST.SPLASH,
             new ImageInfo(CONST.SPLASH, "http://davewaters.ca/res/images/splash.png", [200, 150], [400, 300]),
+            null
+        )
+    )
+    // paused message image
+    game_resources.push(
+        new Media(
+            CONST.PAUSED,
+            new ImageInfo(CONST.PAUSED, "http://davewaters.ca/res/images/paused.png", [200, 40], [400, 80]),
             null
         )
     )

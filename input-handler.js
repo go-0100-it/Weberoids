@@ -25,8 +25,15 @@ function init_input_handler(game, environment){
         let len = game.ships.length;
         switch(e.key){
             case ' ':
+                if(!game.paused){
+                    for(let i = 0; i < len > 0; i++){
+                        game.ships[i].shoot(game);
+                    }
+                }
+                break;
+            case 'p':
                 for(let i = 0; i < len > 0; i++){
-                    game.ships[i].shoot(game);
+                    game.pause();
                 }
                 break;
             default:
@@ -36,49 +43,53 @@ function init_input_handler(game, environment){
 
     document.addEventListener('keyup', function(e){
         let len = game.ships.length;
-        switch(e.key){
-            case 'ArrowUp':
-                for(let i = 0; i < len > 0; i++){
-                    game.ships[i].thrustersOff();
-                }
-                break;
-            case 'ArrowDown':
-                console.log("ArrowDown Release");
-                break;
-            case 'ArrowRight':
-            case 'ArrowLeft':
-                for(let i = 0; i < len > 0; i++){
-                    game.ships[i].rotate(null);
-                }
-                break;
-            default:
-                break;
+        if(!game.paused){
+            switch(e.key){
+                case 'ArrowUp':
+                    for(let i = 0; i < len > 0; i++){
+                        game.ships[i].thrustersOff();
+                    }
+                    break;
+                case 'ArrowDown':
+                    console.log("ArrowDown Release");
+                    break;
+                case 'ArrowRight':
+                case 'ArrowLeft':
+                    for(let i = 0; i < len > 0; i++){
+                        game.ships[i].rotate(null);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     });
 
     document.addEventListener('keydown', function(e){
         let len = game.ships.length;
-        switch(e.key){
-            case 'ArrowUp':
-                for(let i = 0; i < len > 0; i++){
-                    game.ships[0].thrustersOn();
-                }
-                break;
-            case 'ArrowDown':
-                console.log("ArrowDown Depress");
-                break;
-            case 'ArrowRight':
-                for(let i = 0; i < len > 0; i++){
-                    game.ships[i].rotate("CLOCKWISE");
-                }
-                break;
-            case 'ArrowLeft':
-                for(let i = 0; i < len > 0; i++){
-                    game.ships[0].rotate("COUNTERCLOCKWISE");
-                }
-                break;
-            default:
-                break;
+        if(!game.paused){
+            switch(e.key){
+                case 'ArrowUp':
+                    for(let i = 0; i < len > 0; i++){
+                        game.ships[0].thrustersOn();
+                    }
+                    break;
+                case 'ArrowDown':
+                    console.log("ArrowDown Depress");
+                    break;
+                case 'ArrowRight':
+                    for(let i = 0; i < len > 0; i++){
+                        game.ships[i].rotate("CLOCKWISE");
+                    }
+                    break;
+                case 'ArrowLeft':
+                    for(let i = 0; i < len > 0; i++){
+                        game.ships[0].rotate("COUNTERCLOCKWISE");
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     });
 }

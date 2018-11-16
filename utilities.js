@@ -81,15 +81,24 @@ function init_util(){
         };
 
         relativeVelocity(level, vel){
-            let diff_1 = Math.randInt(0, level + 1);
-            let diff_2 =  Math.randInt(0, level + 1);
+            let diff_1;
+            let diff_2;
+            if(level < 3){
+                diff_1 = Math.randInt(0, 2);
+                diff_2 = Math.randInt(0, 2);
+            }else if(level < 5){
+                diff_1 = Math.randInt(0, 3);
+                diff_2 = Math.randInt(0, 2);
+            }else if(level < 7){
+                diff_1 = Math.randInt(0, 3);
+                diff_2 = Math.randInt(0, 3);
+            }
             if(vel[0] < 0){
                 diff_1 = -(diff_1);
             }  
             if(vel[1] < 0){
                 diff_2 = -(diff_2)
             }
-            console.log([vel[0] + diff_1, vel[1] + diff_2]);
             return [vel[0] + diff_1, vel[1] + diff_2];
         };
     }

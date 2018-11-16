@@ -5,17 +5,19 @@ function init_input_handler(game, environment){
     }
 
     environment.canvas.addEventListener('click', function(e){
-        let splash = game.splash;
-        let pos = [];
-        pos[0] = e.layerX ? e.layerX : e.offsetX;
-        pos[1] = e.layerY ? e.layerY : e.offsetY;
-        let size = splash.getImageSize();
-        let center = environment.getCanvasCenter();
-        let in_x = inbounds(pos[0], center[0], size[0]);
-        let in_y = inbounds(pos[1], center[1], size[1]);
-        if(in_x && in_y){
-            game.start();
-        }  
+        if(!game.is_game_on()){
+            let splash = game.splash;
+            let pos = [];
+            pos[0] = e.layerX ? e.layerX : e.offsetX;
+            pos[1] = e.layerY ? e.layerY : e.offsetY;
+            let size = splash.getImageSize();
+            let center = environment.getCanvasCenter();
+            let in_x = inbounds(pos[0], center[0], size[0]);
+            let in_y = inbounds(pos[1], center[1], size[1]);
+            if(in_x && in_y){
+                game.start();
+            }  
+        }
     });
 
 

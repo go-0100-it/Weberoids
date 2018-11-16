@@ -14,7 +14,11 @@ function init_game(resources, env, state, factory){
             this.env = env;
             this.spawn_interval = 2500;
             this.spawn_timer = null
+            this.soundClones = [];
+            this.soundTrack = resources.getResource("Sound track").sound;
             this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
+            this.debris = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
+            //this.backgroundDebris = this.spriteFactory.createBackgroundProjectile([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
             this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
         }
 
@@ -46,15 +50,15 @@ function init_game(resources, env, state, factory){
         getResources(){return this.resources;};
 
         gameOn(){
-            this.game_on = true;
+            this.state.game_on = true;
         };
 
         gameOff(){
-            this.game_on = false;
+            this.state.game_on = false;
         };
 
         is_game_on(){
-            return this.game_on;
+            return this.state.game_on;
         };
 
         addShip(type, pos, vel, ang, ang_vel){
@@ -84,6 +88,10 @@ function init_game(resources, env, state, factory){
             let sprite = this.spriteFactory.createExplosiveProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
             switch(type){
                 case CONST.BASIC_MISSILE:
+                    if(sprite.sound){
+                        let sound = sprite.sound.cloneNode();
+                        sound.play();
+                    }
                     this.missiles.push(sprite);
                     break;
                 default:
@@ -95,6 +103,9 @@ function init_game(resources, env, state, factory){
         addExplosion(type, pos, vel, ang, ang_vel){
             let CONST = this.resources.CONST;
             let sprite = this.spriteFactory.createExplosion(pos, vel, ang, ang_vel, this.resources.getResource(type));
+            if(sprite.sound){
+                sprite.sound.play();
+            }
             this.explosions.push(sprite);
             return sprite;
         }
@@ -110,36 +121,28 @@ function init_game(resources, env, state, factory){
             this.asteroid_debris.push(this.spriteFactory.createSpaceProjectile(pos, vel_1, 0, 0, media));
             this.asteroid_debris.push(this.spriteFactory.createSpaceProjectile(pos, vel_2, 0, 0, media));
         }
+
+        clearExpiredSoundClones(){
+            let len = this.soundClones.length;
+            for(let i = 0; i < len; i++){
+                if(this.soundClones[i]){}
+            }
+        }
         
 
-        draw(env, factor, state){
+        draw(env, factor){
+            this.state.increment_time();
             let canvas = env.getContext();
             let CONST = env.getResources().CONST;
-            // should be calling ship.update(); and ship.draw(); methods here.
-            // Also ship.check_for_collisions();
             this.blueNebula.draw(canvas, env);
-            if(!this.is_game_on()){
-                this.splash.draw(canvas, env, true);
-            }
-           
-            //ship.draw(canvas, env, factor);
-            //asteroid.draw(canvas, env, factor);
-        /// asteroid.update(env, factor);
-
-            // animiate background
-            
+            this.state.time += 1;
+            let t = (this.state.time / 4) % env.getCanvasWidth();
+            this.debris.draw(canvas, env, false, t);
+            this.debris.draw(canvas, env, false, t);
+            //this.backgroundDebris.draw(canvas, env, this.state);
             /*=====================================================================================================
             TODO:
-                Add this, as a new function, to a new static sprite class "Background"
-
-                time += 1
-                this.width = env.canvas.width;
-                this.height = env.canvas.height;
-                this.wtime = (time / 4) % width;
-                this.center = debris_info.get_center();
-                this.size = debris_info.get_size();
-                canvas.draw_image(debris_image, center, size, (wtime - width / 2, width / 2), (width, height));
-                canvas.draw_image(debris_image, center, size, (wtime + width / 2, width / 2), (width, height));
+                Add this, as a new function, to a new static sprite class "Background
 
             =======================================================================================================*/
 
@@ -201,18 +204,28 @@ function init_game(resources, env, state, factory){
                 this.explosions[i].draw(canvas, env, factor);
                 if(this.explosions[i].check_expiry()){
                     if(this.explosions[i].getName() == CONST.SHIP_EXPLOSION){
-                        //reset_view();
+                        if(this.state.getLives() === 0){
+                            this.end();
+                        }else{
+                            this.reset_view();
+                        }
                     }
                     explosions_to_remove.push(this.explosions[i]);
                 }     
             }
             this.explosions = this.explosions.diff(explosions_to_remove);
-        }
+
+            this.state.drawStateDetails(canvas);
+
+            if(!this.is_game_on()){
+                this.splash.draw(canvas, env, true);
+            }
+        }   
 
         // timer handler that spawns a rock    
         spawner(self){
             let CONST = self.env.getResources().CONST;
-            if(self.asteroids.length < self.state.level + 1){
+            if(self.asteroids.length < Math.round(self.state.level / 2 + 1)){
                 let org1 = Math.randInt(0, 3)
                 let width = self.getEnvironment().getCanvasWidth();
                 let level = self.getState().getLevel();
@@ -264,6 +277,9 @@ function init_game(resources, env, state, factory){
 
         start(){
             this.gameOn();
+            this.soundTrack.volume = 0.5;
+            this.soundTrack.loop = true;
+            this.soundTrack.play();
             this.reset_view();
             this.state.setScore(0);
             this.state.setLevel(1);
@@ -280,8 +296,9 @@ function init_game(resources, env, state, factory){
 
         end(){
             this.gameOff();
-            soundtrack.pause();
-            soundtrack.rewind();
+            this.soundTrack.pause();
+            this.soundTrack.loop = false;
+            this.soundTrack.currentTime = 0;
         }
 
         reset_view(){
@@ -290,8 +307,9 @@ function init_game(resources, env, state, factory){
                 this.missiles = [];
                 this.asteroids = [];
                 this.asteroid_debris = [];
-                this.explosions = [];
                 this.addShip(CONST.BASIC_SHIP, env.getCanvasCenter(), [0, 0], 0, 0);
+                //this.explosions = [];
+                //
             }
         }
     }

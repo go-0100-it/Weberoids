@@ -106,6 +106,12 @@ function createSpriteFactory(){
             this.pos[0] = pos ? pos[0] : Sprite.checkBounds(this.pos[0], this.vel[0] * factor, width, size[0])
             this.pos[1] = pos ? pos[1] : Sprite.checkBounds(this.pos[1], this.vel[1] * factor, height, size[1])
         }
+
+        playSound(){
+            if(this.sound){
+                this.sound.play();
+            }
+        }
             
         draw(canvas, env, factor){
             let CONST = env.getResources().CONST;
@@ -128,7 +134,6 @@ function createSpriteFactory(){
             }else{
                 canvas.drawImage(this.getImage(), x, y, size[0], size[1], new_x, new_y, size[0], size[1]);
             }
-            
         }   
         
         update(env, factor){
@@ -156,7 +161,7 @@ function createSpriteFactory(){
                     }
                     explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
                     if(explosion.sound){
-                        explosion.sound.play();
+                        explosion.playSound();
                     }
                     objs1_to_remove.push(objs1[i]);
                     if(objs2.indexOf(this) !== -1){
@@ -177,7 +182,10 @@ function createSpriteFactory(){
         }
     }
 
-    class ExplosiveProjectile extends Sprite{}
+    class ExplosiveProjectile extends Sprite{
+
+
+    }
 
     class Ship extends Sprite{
         check_for_collision(objs, to_remove, game){
@@ -190,13 +198,17 @@ function createSpriteFactory(){
                     let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
                     game.explosions.push(explosion2);
                     game.explosions.push(explosion1);
+                    if(explosion1.sound){
+                        explosion1.playSound();
+                    }
+                    if(explosion2.sound){
+                        explosion2.playSound();
+                    } 
                     game.state.lose_life();
                     to_remove.push(this);
-                    if(explosion1.sound){
-                        explosion1.sound.play();
-                    } 
-                    if(objs[i].sound){
-                        objs[i].sound.pause();
+                    
+                    if(this.isThrusting()){
+                        this.thrustersOff();
                     } 
                     objs_to_remove.push(objs[i]);
                 }  
@@ -207,7 +219,7 @@ function createSpriteFactory(){
 
         thrustersOn(){
             if(this.sound){
-                this.sound.play();
+                this.playSound();
             } 
             this.thrust = true;
         }  
@@ -276,7 +288,7 @@ function createSpriteFactory(){
     class SpaceProjectile extends Sprite{}
 
     class Static extends Sprite{
-        draw(canvas, env, orig_size){
+        draw(canvas, env, orig_size, t){
             let center = env.getCanvasCenter();
             let x_pos = 0;
             let y_pos = 0;
@@ -288,10 +300,15 @@ function createSpriteFactory(){
                 x_size = this.image_size[0];
                 y_size = this.image_size[1];
             }
-            canvas.drawImage(this.image, 0, 0, this.image_size[0], this.image_size[1], x_pos, y_pos, x_size, y_size);
+            if(t){
+                canvas.drawImage(this.image, 0, 0, this.image_size[0], this.image_size[1], t, 0, x_size, y_size);
+                canvas.drawImage(this.image, 0, 0, this.image_size[0], this.image_size[1], t - x_size, 0, x_size, y_size);
+            }else{
+                canvas.drawImage(this.image, 0, 0, this.image_size[0], this.image_size[1], x_pos, y_pos, x_size, y_size);
+            }
             return;
             super.draw();
-        }   
+        }
     }
 
     function createExplosiveProjectile(pos, vel, ang, ang_vel, media){
@@ -310,6 +327,10 @@ function createSpriteFactory(){
         return new SpaceProjectile(pos, vel, ang, ang_vel, media);
     }
 
+    function createBackgroundProjectile(pos, vel, ang, ang_vel, media){
+        return new BackgroundProjectile(pos, vel, ang, ang_vel, media);
+    }
+
     function createStatic(pos, vel, ang, ang_vel, media){
         return new Static(pos, [0, 0], 0, 0, media);
     }
@@ -318,7 +339,8 @@ function createSpriteFactory(){
         createExplosiveProjectile: createExplosiveProjectile,
         createShip: createShip,
         createExplosion: createExplosion,
-        createSpaceProjectile, createSpaceProjectile,
+        createSpaceProjectile: createSpaceProjectile,
+        createBackgroundProjectile: createBackgroundProjectile,
         createStatic: createStatic
     };
 }

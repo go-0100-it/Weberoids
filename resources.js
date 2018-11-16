@@ -36,7 +36,7 @@ function init_resources(){
        init_environment({getResource: getResource, CONST: CONST});
     };
 
-    // The onload callback is triggered everytime an image is loaded
+    // The onload callback is triggered every time an image is loaded
     let onloadCallback = function(){
         // Increment the counter
         loaded_cnt += 1;
@@ -116,10 +116,31 @@ function init_resources(){
             } 
         }
 
-        loadSound(){
-            if(this.getSoundUrl !== null){
-                let src = this.soundUrl;
-                this.setSound(new Audio(this.getSoundUrl()));
+        // audioSupport() {
+        //     var a = document.createElement('audio');
+        //     var ogg = !!(a.canPlayType && a.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''));
+        //     if (ogg) return 'ogg';
+        //     var mp3 = !!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
+        //     if (mp3) return 'mp3';
+        //     else return 0;
+        // } 
+
+        loadAudio(url, vol){
+            let audio = new Audio();
+            audio.src = url;
+            audio.preload = "auto";
+            audio.volume = vol;
+            return audio;
+        }
+
+        soundLoaded(e){
+           console.dir(e.path[0].src);
+        }
+
+        loadSound(vol = 1){
+            if(this.getSoundUrl() !== null){
+                this.setSound(this.loadAudio(this.getSoundUrl(), vol));
+                this.sound.addEventListener('canplaythrough', this.soundLoaded, false);
             }
         }
 
@@ -170,7 +191,7 @@ function init_resources(){
     // please do not redistribute without permission from Emiel at http://www.filmcomposer.nl
     //soundtrack = "https://storage.googleapis.com/codeskulptor-assets/ricerocks_theme.mp3")
         
-     let explosion_sound = "http://www.davewaters.ca/res/sounds/explosion.mp3";
+    let explosion_sound = "http://www.davewaters.ca/res/sounds/explosion.mp3";
     // art assets created by Kim Lathrop, may be freely re-used in non-commercial projects, please credit Kim
     
     // sound assets purchased from sounddogs.com, please do not redistribute
@@ -178,7 +199,9 @@ function init_resources(){
         new Media(
             CONST.SOUND_TRACK,
             null,
-            "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
+            //"http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
+            //"http://www.davewaters.ca/res/sounds/soundtrack2.mp3"
+            "http://www.davewaters.ca/res/sounds/IntoTheSing.mp3"
         )
     )
     // debris images - debris1_brown.png, debris2_brown.png, debris3_brown.png, debris4_brown.png
@@ -186,7 +209,7 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.DEBRIS,
-            new ImageInfo(CONST.DEBRIS, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/debris2_blue.png", [320, 240], [640, 480]),
+            new ImageInfo(CONST.DEBRIS, "http://www.davewaters.ca/res/images/debris2_blue.png", [320, 240], [640, 480]),
             null
         ) 
     )
@@ -202,7 +225,7 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.BLUE_NEBULA,
-            new ImageInfo(CONST.BLUE_NEBULA, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_blue.png", [400, 300], [800, 600]),
+            new ImageInfo(CONST.BLUE_NEBULA, "http://www.davewaters.ca/res/images/nebula_blue.png", [400, 300], [800, 600]),
             null
         )
     )
@@ -210,7 +233,7 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.BROWN_NEBULA,
-            new ImageInfo(CONST.BROWN_NEBULA, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/nebula_brown.png", [400, 300], [800, 600]),
+            new ImageInfo(CONST.BROWN_NEBULA, "http://davewaters.ca/res/images/nebula_brown.png", [400, 300], [800, 600]),
             null
         )
     )
@@ -218,7 +241,7 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.SPLASH,
-            new ImageInfo(CONST.SPLASH, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/splash.png", [200, 150], [400, 300]),
+            new ImageInfo(CONST.SPLASH, "http://davewaters.ca/res/images/splash.png", [200, 150], [400, 300]),
             null
         )
     )
@@ -226,15 +249,15 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.BASIC_SHIP,
-            new ImageInfo(CONST.BASIC_SHIP, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/double_ship.png", [45, 45], [90, 90], 35),
-            "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.mp3"
+            new ImageInfo(CONST.BASIC_SHIP, "http://davewaters.ca/res/images/double_ship.png", [45, 45], [90, 90], 35),
+            "http://davewaters.ca/res/sounds/thrust.mp3"
         )
     )
     // missile image - shot1.png, shot2.png, shot3.png
     game_resources.push(
         new Media(
             CONST.BASIC_MISSILE,
-            new ImageInfo(CONST.BASIC_MISSILE, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/shot2.png", [5,5], [10, 10], 4, 50),
+            new ImageInfo(CONST.BASIC_MISSILE, "http://davewaters.ca/res/images/shot2.png", [5,5], [10, 10], 4, 60),
             "http://www.davewaters.ca/res/sounds/laser.mp3"
         )
     )
@@ -242,7 +265,7 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.ASTEROID,
-            new ImageInfo(CONST.ASTEROID, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/asteroid_blue.png", [45, 45], [90, 90], 40),
+            new ImageInfo(CONST.ASTEROID, "http://davewaters.ca/res/images/asteroid_blue.png", [45, 45], [90, 90], 40),
             null
         )
     )
@@ -271,8 +294,8 @@ function init_resources(){
     game_resources.push(
         new Media(
             CONST.SHIP_EXPLOSION,
-            new ImageInfo(CONST.SHIP_EXPLOSION, "http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/explosion_alpha.png", [64, 64], [128, 128], 17, 24, true),
-            explosion_sound
+            new ImageInfo(CONST.SHIP_EXPLOSION, "http://www.davewaters.ca/res/images/explosion_alpha.png", [64, 64], [128, 128], 17, 24, true),
+            "http://www.davewaters.ca/res/sounds/ship_explosion.mp3"
         )
     )
     let len = game_resources.length;

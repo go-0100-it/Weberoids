@@ -1,11 +1,13 @@
 function createSpriteFactory(){
+
     class Sprite{
         constructor(pos, vel, ang, ang_vel, media){
             this.pos = [pos[0] , pos[1]];
             this.vel = [vel[0],vel[1]];
             this.angle = ang;
             this.angle_vel = ang_vel;
-            this.image = media.image;
+            this.image = media.image[0];
+            this.images = media.image;
             this.name = media.name;
             this.image_center = media.info.get_center();
             this.image_size = media.info.get_size();
@@ -86,7 +88,7 @@ function createSpriteFactory(){
             let ctr = this.getImageCenter();
             canvas.translate(pos[0], pos[1]);
             canvas.rotate(ang);
-            canvas.drawImage(this.getImage(), x, y, size[0], size[1], -ctr[0], -ctr[1], size[0], size[1]);
+            canvas.drawImage(this.image, x, y, size[0], size[1], -ctr[0], -ctr[1], size[0], size[1]);
             canvas.rotate(-ang);
             canvas.translate(-pos[0], -pos[1]);
         }
@@ -123,7 +125,7 @@ function createSpriteFactory(){
             let y = img_ctr[1] - half_img_y;
             if(this.isAnimation()){
                 x = size[0] * this.getAge(); 
-            }else if(this.getName() === CONST.BASIC_SHIP && this.isThrusting()){
+            }else if((this.getName() === CONST.BLUE_SHIP || this.getName() === CONST.BASIC_SHIP) && this.isThrusting()){
                 x = size[0]; 
                 this.update_thrust()
             }
@@ -145,16 +147,28 @@ function createSpriteFactory(){
         check_for_collision(objs1, objs2, objs2_to_remove, game){
             let CONST = game.getResources().CONST;
             let objs1_to_remove = [];
-            let len = objs1.length;
-            for(let i = 0; i < len; i++){
+            let len12 = objs1.length;
+            for(let i = 0; i < len12; i++){
                 if(Sprite.collision_detect(this, objs1[i])){
+                    if(game.state.update_level()){
+                        game.level_up();
+                    };
                     let explosionType = null;
                     let explosion = null;
-                    game.state.update_level();
+                    let healthDepleted = false;
+
+
                     if(this.name === CONST.ASTEROID){
                         game.state.increment_score(50);
-                        explosionType = CONST.ASTEROID_EXPLOSION;
-                        game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
+                        this.health = this.health - 1;
+                        explosionType = CONST.MISSILE_EXPLOSION;
+                        if(this.health === 0){
+                            healthDepleted = true;
+                            explosionType = CONST.ASTEROID_EXPLOSION;
+                        }else{
+                            this.image = this.images[5 - this.health];
+                        }
+                        //game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
                     }else if(this.name === CONST.ASTEROID_DEBRIS){
                         game.state.increment_score(100);
                         explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
@@ -164,7 +178,7 @@ function createSpriteFactory(){
                         explosion.playSound();
                     }
                     objs1_to_remove.push(objs1[i]);
-                    if(objs2.indexOf(this) !== -1){
+                    if(objs2.indexOf(this) !== -1 && healthDepleted){
                         objs2_to_remove.push(this);
                     }
                 }
@@ -183,98 +197,23 @@ function createSpriteFactory(){
     }
 
     class ExplosiveProjectile extends Sprite{
-
-
+        constructor(pos, vel, ang, ang_vel, media, health = 1){
+            super(pos, vel, ang, ang_vel, media);
+            this.health = health;
+        }
     }
 
-    class Ship extends Sprite{
-        check_for_collision(objs, to_remove, game){
-            let CONST = game.getResources().CONST;
-            let explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.SHIP_EXPLOSION));
-            let objs_to_remove = [];
-            let len = objs.length;
-            for(let i = 0; i < len; i++){
-                if(Sprite.collision_detect(this, objs[i])){
-                    let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
-                    game.explosions.push(explosion2);
-                    game.explosions.push(explosion1);
-                    if(explosion1.sound){
-                        explosion1.playSound();
-                    }
-                    if(explosion2.sound){
-                        explosion2.playSound();
-                    } 
-                    game.state.lose_life();
-                    to_remove.push(this);
-                    
-                    if(this.isThrusting()){
-                        this.thrustersOff();
-                    } 
-                    objs_to_remove.push(objs[i]);
-                }  
-            }                
-            return objs.diff(objs_to_remove);
-            super.check_for_collision();
+    class StaticAnimated extends Sprite{
+
+        constructor(pos, vel, ang, ang_vel, media){
+            super(pos, vel, ang, ang_vel, media);
+            this.isShowing = false;
         }
 
-        thrustersOn(){
-            if(this.sound){
-                this.playSound();
-            } 
-            this.thrust = true;
-        }  
-            
-        thrustersOff(){
-            if(this.sound){
-                this.sound.pause();
-            } 
-            this.thrust = false;
-        }  
-            
-        isThrusting(){
-            return this.thrust;
-        }
-            
-        rotate(direction){
-            if(direction == "CLOCKWISE"){
-                this.angle_vel = 4;
-            }    
-            else if(direction == "COUNTERCLOCKWISE"){
-                this.angle_vel = -4;
-            }
-            else{
-                this.angle_vel = 0;
-            }   
-        }
-
-        update_friction(env){
-            this.vel[0] = this.vel[0] * (1 - env.utils.const)
-            this.vel[1] = this.vel[1] * (1 - env.utils.const)
-        }   
-            
-        shoot(game){
-            let CONST = game.getResources().CONST;
-            let pos_x = this.pos[0] + ((this.pos[0] + this.radius - this.pos[0]) * Math.cos(this.angle)) + ((this.pos[1] - this.pos[1]) * Math.sin(this.angle))
-            let pos_y = this.pos[1] + ((this.pos[1] - this.pos[1]) * Math.cos(this.angle)) + ((this.pos[0] + this.radius - this.pos[0]) * Math.sin(this.angle))
-            let pos = [pos_x, pos_y]
-            let forward = [Math.cos(this.angle), Math.sin(this.angle)]
-            let vel_x = this.vel[0] + forward[0]*10
-            let vel_y = this.vel[1] + forward[1]*10
-            game.addExplosiveProjectile(CONST.BASIC_MISSILE, pos, [vel_x, vel_y], 0, this.angle_vel);
-        }    
-        
-        update_thrust(){
-            let forward = [Math.cos(this.angle), Math.sin(this.angle)]
-            this.vel[0] += forward[0]/3
-            this.vel[1] += forward[1]/3
-        }
-
-        update(env, factor){
-            this.angle += Math.rad(this.angle_vel);
-            this.update_position(env, factor);
-            this.update_friction(env);
-            return;
-            super.update();
+        draw(canvas, env, factor){
+            super.draw(canvas, env, factor);
+                return;
+                super.draw();
         }
     }
 
@@ -282,12 +221,22 @@ function createSpriteFactory(){
         update(env, factor){
             super.update(env, factor);
         }
-        
     }
-
-    class SpaceProjectile extends Sprite{}
-
+    
+    class SpaceProjectile extends Sprite{
+        constructor(pos, vel, ang, ang_vel, media, health = 1){
+            super(pos, vel, ang, ang_vel, media);
+            this.health = health;
+        }
+    }
+    
     class Static extends Sprite{
+    
+        constructor(pos, vel, ang, ang_vel, media){
+            super(pos, vel, ang, ang_vel, media);
+            this.isShowing = false;
+        }
+    
         draw(canvas, env, orig_size, t){
             let center = env.getCanvasCenter();
             let x_pos = 0;
@@ -316,15 +265,15 @@ function createSpriteFactory(){
     }
 
     function createShip(pos, vel, ang, ang_vel, media){
-        return new Ship(pos, vel, ang, ang_vel, media);
+        return ship_factory(pos, vel, ang, ang_vel, media);
     }
 
     function createExplosion(pos, vel, ang, ang_vel, media){
         return new Explosion(pos, vel, ang, ang_vel, media);
     }
 
-    function createSpaceProjectile(pos, vel, ang, ang_vel, media){
-        return new SpaceProjectile(pos, vel, ang, ang_vel, media);
+    function createSpaceProjectile(pos, vel, ang, ang_vel, media, health){
+        return new SpaceProjectile(pos, vel, ang, ang_vel, media, health);
     }
 
     function createBackgroundProjectile(pos, vel, ang, ang_vel, media){
@@ -335,12 +284,17 @@ function createSpriteFactory(){
         return new Static(pos, [0, 0], 0, 0, media);
     }
 
+    function createStaticAnimated(pos, vel, ang, ang_vel, media){
+        return new StaticAnimated(pos, vel, ang, ang_vel, media);
+    }
+
     return {
         createExplosiveProjectile: createExplosiveProjectile,
         createShip: createShip,
         createExplosion: createExplosion,
         createSpaceProjectile: createSpaceProjectile,
         createBackgroundProjectile: createBackgroundProjectile,
-        createStatic: createStatic
+        createStatic: createStatic,
+        createStaticAnimated: createStaticAnimated
     };
 }

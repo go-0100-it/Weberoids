@@ -1,11 +1,15 @@
 function init_input_handler(game, environment){
 
+    let fired = false;
+    let paused = false;
+
     function inbounds(coord, center, size){
         return (coord > center - size / 2) && (coord < center + size / 2)
     }
 
     environment.canvas.addEventListener('click', function(e){
-        if(!game.is_game_on()){
+
+        if(game.splash.isShowing){
             let splash = game.splash;
             let pos = [];
             pos[0] = e.layerX ? e.layerX : e.offsetX;
@@ -17,6 +21,18 @@ function init_input_handler(game, environment){
             if(in_x && in_y){
                 game.start();
             }  
+        }else if(game.levelUp.isShowing){
+            let leveled_up_splash = game.levelUp;
+            let pos = [];
+            pos[0] = e.layerX ? e.layerX : e.offsetX;
+            pos[1] = e.layerY ? e.layerY : e.offsetY;
+            let size = leveled_up_splash.getImageSize();
+            let center = environment.getCanvasCenter();
+            let in_x = inbounds(pos[0], center[0], size[0]);
+            let in_y = inbounds(pos[1], center[1], size[1]);
+            if(in_x && in_y){
+                game.resetLevelUp();
+            }  
         }
     });
 
@@ -25,15 +41,22 @@ function init_input_handler(game, environment){
         let len = game.ships.length;
         switch(e.key){
             case ' ':
-                if(!game.paused){
+                if(!game.paused && !fired){
                     for(let i = 0; i < len > 0; i++){
                         game.ships[i].shoot(game);
                     }
+                    fired = true;
                 }
                 break;
             case 'p':
-                for(let i = 0; i < len > 0; i++){
+                if(!paused && !game.leveled_up){
                     game.pause();
+                    paused = true;
+                }
+                break;
+            case 'Enter':
+                if(game.leveled_up && game.paused){
+                    game.resetLevelUp();
                 }
                 break;
             default:
@@ -59,9 +82,17 @@ function init_input_handler(game, environment){
                         game.ships[i].rotate(null);
                     }
                     break;
+                case ' ':
+                    fired = false;
+                    break;
+                case 'p':
+                    paused = false;
+                    break;
                 default:
                     break;
             }
+        }else if(e.key === "p"){
+            paused = false;
         }
     });
 

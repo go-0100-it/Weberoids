@@ -1,7 +1,7 @@
 function init_game_state(){
     class State{
         constructor(){
-            this.score = 29950;
+            this.score = 0;
             this.time = 0;
             this.game_on = false;
             this.level = 1;
@@ -65,11 +65,12 @@ function init_game_state(){
         }
 
         update_level(){
-            if(this.level === 1 && this.score > 7499){
+            let leveled_up = true;
+            if(this.level === 1 && this.score > 4999){
                 this.level = 2;
                 this.lives += this.level;
             }
-            else if(this.level === 2 && this.score > 14999){
+            else if(this.level === 2 && this.score > 9999){
                 this.level = 3;
                 this.lives += this.level;
             }
@@ -88,7 +89,10 @@ function init_game_state(){
             else if(this.level === 6 && this.score > 49999){
                 this.level = 7;
                 this.lives += this.level;
+            }else{
+                leveled_up = false;
             }
+            return leveled_up;
         }
     }
         return new State();

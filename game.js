@@ -2,25 +2,25 @@ function init_game(resources, env, state, factory){
 
     class Game{
         constructor(resources, env, state, factory){
+            this.env = env;
+            this.resources = resources;
+            this.state = state;
             this.missiles = [];
             this.ships = [];
             this.asteroids = [];
             this.asteroid_debris = [];
             this.explosions = [];
-            this.time = 0;
-            this.state = state;
             this.spriteFactory = factory;
-            this.resources = resources;
-            this.env = env;
             this.spawn_interval = 2500;
-            this.spawn_timer = null
-            this.paused = false;
+            this.spawn_timer = null;
+            this.leveled_up = false;
+            this.asteroidCnt = [3, 3, 4, 4, 3, 3, 4, 4]
             this.soundTrack = resources.getResource("Sound track").sound;
             this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
             this.debris = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
-            //this.backgroundDebris = this.spriteFactory.createBackgroundProjectile([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
-            this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
+            this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
             this.pausedMessage = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.PAUSED));
+            this.levelUp = this.spriteFactory.createStaticAnimated(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.LEVEL_UP));
         }
 
         startSpawning(){
@@ -66,14 +66,15 @@ function init_game(resources, env, state, factory){
             this.ships.push(this.spriteFactory.createShip(pos, vel, ang, ang_vel, this.resources.getResource(type)));
         };
 
-        addSpaceProjectile(type, pos, vel, ang, ang_vel){
+        addSpaceProjectile(type, pos, vel, ang, ang_vel, health){
             let CONST = this.resources.CONST;
             switch(type){
                 case CONST.ASTEROID_DEBRIS:
                     this.addMultiple(type, pos, vel);
                     break;
                 case CONST.ASTEROID:
-                    this.asteroids.push(this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type)));
+                    let sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type), health);
+                    this.asteroids.push(sprite);
                     break;
                 default:
                     break;
@@ -89,6 +90,7 @@ function init_game(resources, env, state, factory){
             let sprite = this.spriteFactory.createExplosiveProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
             switch(type){
                 case CONST.BASIC_MISSILE:
+                case CONST.FORCE_MISSILE:
                     if(sprite.sound){
                         let sound = sprite.sound.cloneNode();
                         sound.play();
@@ -129,6 +131,21 @@ function init_game(resources, env, state, factory){
                 if(this.soundClones[i]){}
             }
         }
+
+        level_up(){
+            this.pause("levelUp");
+            this.levelUp.sound.play();
+            this.leveled_up = true;
+            this.levelUp.isShowing = true;
+        }
+
+
+        resetLevelUp(){
+            this.clearProjectiles();
+            this.pause();
+            this.leveled_up = false;
+            this.levelUp.isShowing = false;
+        }
         
 
         draw(env, factor){
@@ -168,8 +185,8 @@ function init_game(resources, env, state, factory){
             
 
             let ships_to_remove = [];
-            len = this.ships.length;
-            for(let i = 0; i < len; i++){
+            let len2 = this.ships.length;
+            for(let i = 0; i < len2; i++){
                 if(!this.paused){
                     this.ships[i].update(env, factor);
                 }
@@ -180,10 +197,9 @@ function init_game(resources, env, state, factory){
             this.ships = this.ships.diff(ships_to_remove);
             
 
-
             let asteroids_to_remove = [];
-            len = this.asteroids.length;
-            for(let i = 0; i < len; i++){
+            let len3 = this.asteroids.length;
+            for(let i = 0; i < len3; i++){
                 if(!this.paused){
                     this.asteroids[i].update(env, factor);
                 }
@@ -195,8 +211,8 @@ function init_game(resources, env, state, factory){
 
 
             let asteroid_debris_to_remove = [];
-            len = this.asteroid_debris.length;
-            for(let i = 0; i < len; i++){
+            let len4 = this.asteroid_debris.length;
+            for(let i = 0; i < len4; i++){
                 if(!this.paused){
                     this.asteroid_debris[i].update(env, factor);
                 }
@@ -208,8 +224,8 @@ function init_game(resources, env, state, factory){
 
 
             let explosions_to_remove = [];
-            len = this.explosions.length;
-            for(let i = 0; i < len; i++){
+            let len5 = this.explosions.length;
+            for(let i = 0; i < len5; i++){
                 if(!this.paused){
                     this.explosions[i].update(env, factor);
                 }
@@ -231,8 +247,18 @@ function init_game(resources, env, state, factory){
 
             if(!this.is_game_on()){
                 this.splash.draw(canvas, env, true);
+                this.splash.isShowing = true;
             }else if(this.paused){
-                this.pausedMessage.draw(canvas, env, true);
+                if(this.leveled_up){
+                    if(this.levelUp.getAge() < 49){
+                        this.levelUp.update(env, 0);
+                    }  
+                    this.levelUp.draw(canvas, env, true);
+                }else{
+                    this.pausedMessage.draw(canvas, env, true);
+                }
+            }else{
+                this.levelUp.age = 0;
             }
         }
             
@@ -240,7 +266,7 @@ function init_game(resources, env, state, factory){
         // timer handler that spawns a rock    
         spawner(self){
             let CONST = self.env.getResources().CONST;
-            if(self.asteroids.length < Math.round(self.state.level / 2 + 1)){
+            if(self.asteroids.length < self.asteroidCnt[self.state.level]){
                 let org1 = Math.randInt(0, 3)
                 let width = self.getEnvironment().getCanvasWidth();
                 let level = self.getState().getLevel();
@@ -275,7 +301,7 @@ function init_game(resources, env, state, factory){
                     }  
                 }
                 let spin = (org1 + 1) / 5000;
-                self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin);
+                self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin, 5);
             }
         }
             
@@ -292,6 +318,7 @@ function init_game(resources, env, state, factory){
 
         start(){
             this.gameOn();
+            this.splash.isShowing = false;
             this.soundTrack.volume = 0.5;
             this.soundTrack.loop = true;
             this.soundTrack.play();
@@ -308,6 +335,11 @@ function init_game(resources, env, state, factory){
 
         pause(){
             this.paused = !this.paused;
+            if(this.paused){
+                this.soundTrack.pause();
+            }else{
+                this.soundTrack.play();
+            }
         } 
 
         end(){
@@ -317,15 +349,17 @@ function init_game(resources, env, state, factory){
             this.soundTrack.currentTime = 0;
         }
 
+        clearProjectiles(){
+            this.missiles = [];
+            this.asteroids = [];
+            this.asteroid_debris = [];
+        }
+
         reset_view(){
             let CONST = env.getResources().CONST;
             if(this.is_game_on()){
-                this.missiles = [];
-                this.asteroids = [];
-                this.asteroid_debris = [];
-                this.addShip(CONST.BASIC_SHIP, env.getCanvasCenter(), [0, 0], 0, 0);
-                //this.explosions = [];
-                //
+                this.clearProjectiles();
+                this.addShip(CONST.BLUE_SHIP, env.getCanvasCenter(), [0, 0], 0, 0);
             }
         }
     }

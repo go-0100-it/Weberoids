@@ -20,6 +20,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             this.SHIP_EXPLOSION = "Ship explosion";
             this.LEVEL_UP = "Level up";
             this.MISSILE_EXPLOSION = "Missile explosion";
+            this.HEART = "Heart";
         }
     }
 
@@ -197,6 +198,14 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             CONST.MISSILE_EXPLOSION,
             new ImageInfo(CONST.MISSILE_EXPLOSION, ["http://www.davewaters.ca/res/images/missile_explosion.png"], [25, 25], [50, 50], 10, 24, true),
             explosion_sound,
+            null
+        )
+    )
+    media.push(
+        new Media(
+            CONST.HEART,
+            new ImageInfo(CONST.HEART, ["http://www.davewaters.ca/res/images/heart.png"], [25, 25], [50, 50], 10, 60, false),
+            "http://www.davewaters.ca/res/sounds/gain_life.mp3",
             null
         )
     )

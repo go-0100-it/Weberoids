@@ -147,46 +147,49 @@ class Sprite{
         let objs1_to_remove = [];
         let len12 = objs1.length;
         for(let i = 0; i < len12; i++){
-            if(Sprite.collision_detect(this, objs1[i])){
-                if(game.state.update_level()){
-                    game.level_up();
-                };
-                let explosionType = null;
-                let explosion = null;
-                let healthDepleted = false;
+            if(this.name !== CONST.HEART){
+                if(Sprite.collision_detect(this, objs1[i])){
+                    if(game.state.update_level()){
+                        game.level_up();
+                    };
+                    let explosionType = null;
+                    let explosion = null;
+                    let healthDepleted = false;
 
 
-                if(this.name === CONST.ASTEROID){
+                    if(this.name === CONST.ASTEROID){
+                        console.dir(objs1[i])
+                        console.dir(this)
+                        if(this.health - objs1[i].power < 1){
+                            game.state.increment_score(50 * this.health);
+                        }else{
+                            game.state.increment_score(50 * objs1[i].power);
+                        }
+                        this.health = this.health - objs1[i].power;
+                        explosionType = CONST.MISSILE_EXPLOSION;
+                        if(this.health < 1){
+                            healthDepleted = true;
+                            explosionType = CONST.ASTEROID_EXPLOSION;
+                        }else{
+                            this.image = this.images[5 - this.health];
+                        }
+                        //game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
 
-                    if(this.health - objs1[i].power < 0){
-                        game.state.increment_score(50 * this.health);
-                    }else{
-                        game.state.increment_score(50 * objs1[i].power);
+
+                    }else if(this.name === CONST.ASTEROID_DEBRIS){
+                        game.state.increment_score(100);
+                        explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
                     }
-                    this.health = this.health - objs1[i].power;
-                    explosionType = CONST.MISSILE_EXPLOSION;
-                    if(this.health < 1){
-                        healthDepleted = true;
-                        explosionType = CONST.ASTEROID_EXPLOSION;
-                    }else{
-                        this.image = this.images[5 - this.health];
+
+
+                    explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
+                    if(explosion.sound){
+                        explosion.playSound();
                     }
-                    //game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
-
-
-                }else if(this.name === CONST.ASTEROID_DEBRIS){
-                    game.state.increment_score(100);
-                    explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
-                }
-
-
-                explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
-                if(explosion.sound){
-                    explosion.playSound();
-                }
-                objs1_to_remove.push(objs1[i]);
-                if(objs2.indexOf(this) !== -1 && healthDepleted){
-                    objs2_to_remove.push(this);
+                    objs1_to_remove.push(objs1[i]);
+                    if(objs2.indexOf(this) !== -1 && healthDepleted){
+                        objs2_to_remove.push(this);
+                    }
                 }
             }
         }

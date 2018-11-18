@@ -13,21 +13,26 @@ class Ship extends Sprite{
         let len = objs.length;
         for(let i = 0; i < len; i++){
             if(Sprite.collision_detect(this, objs[i])){
-                let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
-                game.explosions.push(explosion2);
-                game.explosions.push(explosion1);
-                if(explosion1.sound){
-                    explosion1.playSound();
+                if(objs[i].name == CONST.HEART){
+                    objs[i].sound.play();
+                }else{
+                    let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
+                    game.explosions.push(explosion2);
+                    game.explosions.push(explosion1);
+                    if(explosion1.sound){
+                        explosion1.playSound();
+                    }
+                    if(explosion2.sound){
+                        explosion2.playSound();
+                    } 
+                    game.state.lose_life();
+                    to_remove.push(this);
+                    
+                    if(this.isThrusting()){
+                        this.thrustersOff();
+                    } 
                 }
-                if(explosion2.sound){
-                    explosion2.playSound();
-                } 
-                game.state.lose_life();
-                to_remove.push(this);
                 
-                if(this.isThrusting()){
-                    this.thrustersOff();
-                } 
                 objs_to_remove.push(objs[i]);
             }  
         }                

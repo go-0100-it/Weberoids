@@ -1,7 +1,7 @@
 class ExplosiveProjectile extends Sprite{
     constructor(pos, vel, ang, ang_vel, media){
         super(pos, vel, ang, ang_vel, media);
-        this.health = media.gamePlayData.health;
+        this.health =  media.gamePlayData !== null ? media.gamePlayData.health : 1;
         this.power = media.gamePlayData.power;
     }
 }
@@ -27,9 +27,9 @@ class Explosion extends Sprite{
 }
 
 class SpaceProjectile extends Sprite{
-    constructor(pos, vel, ang, ang_vel, media, health = 1, power = 1){
+    constructor(pos, vel, ang, ang_vel, media){
         super(pos, vel, ang, ang_vel, media);
-        this.health = health;
+        this.health = media.gamePlayData !== null ? media.gamePlayData.health : 1;
     }
 }
 

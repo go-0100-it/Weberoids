@@ -14,6 +14,7 @@ function init_game(resources, env, state, factory){
             this.spawn_interval = 2500;
             this.spawn_timer = null;
             this.leveled_up = false;
+            this.bonusCnt = 0;
             this.asteroidCnt = [3, 3, 4, 4, 3, 3, 4, 4]
             this.soundTrack = resources.getResource("Sound track").sound;
             this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
@@ -66,14 +67,19 @@ function init_game(resources, env, state, factory){
             this.ships.push(this.spriteFactory.createShip(pos, vel, ang, ang_vel, this.resources.getResource(type)));
         };
 
-        addSpaceProjectile(type, pos, vel, ang, ang_vel, health){
+        addSpaceProjectile(type, pos, vel, ang, ang_vel){
             let CONST = this.resources.CONST;
+            let sprite;
             switch(type){
                 case CONST.ASTEROID_DEBRIS:
                     this.addMultiple(type, pos, vel);
                     break;
                 case CONST.ASTEROID:
-                    let sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type), health);
+                    sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
+                    this.asteroids.push(sprite);
+                    break;
+                case CONST.HEART:
+                    sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
                     this.asteroids.push(sprite);
                     break;
                 default:
@@ -258,6 +264,7 @@ function init_game(resources, env, state, factory){
 
         // timer handler that spawns a rock    
         spawner(self){
+            self.bonusCnt += 1;
             let CONST = self.env.getResources().CONST;
             if(self.asteroids.length < self.asteroidCnt[self.state.level]){
                 let org1 = Math.randInt(0, 3)
@@ -294,6 +301,9 @@ function init_game(resources, env, state, factory){
                     }  
                 }
                 let spin = (org1 + 1) / 5000;
+                if(self.bonusCnt % 25 === 0){
+                    self.addSpaceProjectile(CONST.HEART, origin, velocity, 0, spin, 5);
+                }
                 self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin, 5);
             }
         }

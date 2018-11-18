@@ -5,7 +5,11 @@ function init_game_state(){
             this.time = 0;
             this.game_on = false;
             this.level = 1;
+            this.universe = 1;
             this.lives = 3;
+            this.ships = [];
+            this.explosiveProjectiles = {};
+            this.shields = 0;
         }
 
         setLives(int){
@@ -46,6 +50,14 @@ function init_game_state(){
             this.score += inc;
         }
 
+        increment_universe(n = 1){
+            this.universe += n;
+        }
+
+        increment_shields(n = 1){
+            this.shields += n;
+        }
+
         increment_time(){
             this.time += 1;
         }
@@ -59,9 +71,17 @@ function init_game_state(){
             canvas.fillText("LEVEL  " + this.level,530,50);
             //console.log("TEXTING")
         }
+
+        addShip(ship){
+            this.ships.push(ship);
+        }
+
+        addExplosiveProjectiles(projectile){
+            this.explosiveProjectiles.push(projectile);
+        }
         
-        gain_life(){
-            this.lives += 1;
+        gain_life(n = 1){
+            this.lives += n;
         }
 
         update_level(){

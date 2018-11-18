@@ -66,7 +66,7 @@ function init_resources(){
     };
 
     class Media{
-        constructor(name, info, soundUrl){
+        constructor(name, info, soundUrl, gamePlayData){
             this.name = name;
             this.info = info;
             this.image = [];
@@ -74,6 +74,7 @@ function init_resources(){
             this.soundUrl = soundUrl;
             this.img_loaded = false;
             this.sound_loaded = false;
+            this.gamePlayData = gamePlayData;
         }
 
         setSound(sound){this.sound = sound;};
@@ -168,7 +169,21 @@ function init_resources(){
         }
     }
 
-    let resources = getMediaList(Media, ImageInfo)
+
+    class GamePlayData{
+        constructor(name, projectileType = null, health = 1, power = 1){
+            this.name = name;
+            this.health = health;
+            this.power = power;
+            this.projectileType = projectileType;
+        };
+
+        getHealth(name){return this.health};
+        getPower(name){return this.power};
+        getProjectileType(name){return this.projectileType};
+    }
+
+    let resources = getMediaList(Media, ImageInfo, GamePlayData)
     game_resources = resources.media;
     CONST = resources.CONST;
     let len = game_resources.length;

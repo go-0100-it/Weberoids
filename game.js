@@ -125,13 +125,6 @@ function init_game(resources, env, state, factory){
             this.asteroid_debris.push(this.spriteFactory.createSpaceProjectile(pos, vel_2, 0, 0, media));
         }
 
-        clearExpiredSoundClones(){
-            let len = this.soundClones.length;
-            for(let i = 0; i < len; i++){
-                if(this.soundClones[i]){}
-            }
-        }
-
         level_up(){
             this.pause("levelUp");
             this.levelUp.sound.play();

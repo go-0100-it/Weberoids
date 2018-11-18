@@ -1,7 +1,10 @@
 class Ship extends Sprite{
-    constructor(pos, vel, ang, ang_vel, media, health = 1){
+    constructor(pos, vel, ang, ang_vel, media){
+        console.log("MEDIA");
+        console.dir(media);
         super(pos, vel, ang, ang_vel, media);
-        this.health = health;
+        this.health = media.gamePlayData.health;
+        this.projectileType = media.gamePlayData.projectileType;
     }
     check_for_collision(objs, to_remove, game){
         let CONST = game.getResources().CONST;
@@ -62,6 +65,7 @@ class Ship extends Sprite{
         }   
     }
 
+
     update_friction(env){
         this.vel[0] = this.vel[0] * (1 - env.utils.const)
         this.vel[1] = this.vel[1] * (1 - env.utils.const)
@@ -75,7 +79,7 @@ class Ship extends Sprite{
         let forward = [Math.cos(this.angle), Math.sin(this.angle)]
         let vel_x = this.vel[0] + forward[0]*10
         let vel_y = this.vel[1] + forward[1]*10
-        game.addExplosiveProjectile(CONST.BASIC_MISSILE, pos, [vel_x, vel_y], this.angle, 0);
+        game.addExplosiveProjectile(this.projectileType, pos, [vel_x, vel_y], this.angle, 0);
     }    
     
     update_thrust(){

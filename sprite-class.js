@@ -157,20 +157,29 @@ class Sprite{
 
 
                 if(this.name === CONST.ASTEROID){
-                    game.state.increment_score(50);
-                    this.health = this.health - 1;
+
+                    if(this.health - objs1[i].power < 0){
+                        game.state.increment_score(50 * this.health);
+                    }else{
+                        game.state.increment_score(50 * objs1[i].power);
+                    }
+                    this.health = this.health - objs1[i].power;
                     explosionType = CONST.MISSILE_EXPLOSION;
-                    if(this.health === 0){
+                    if(this.health < 1){
                         healthDepleted = true;
                         explosionType = CONST.ASTEROID_EXPLOSION;
                     }else{
                         this.image = this.images[5 - this.health];
                     }
                     //game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
+
+
                 }else if(this.name === CONST.ASTEROID_DEBRIS){
                     game.state.increment_score(100);
                     explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
                 }
+
+
                 explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
                 if(explosion.sound){
                     explosion.playSound();

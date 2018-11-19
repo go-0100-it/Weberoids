@@ -46,6 +46,10 @@ function init_game_state(){
             }
         }
 
+        gain_life(n = 1){
+            this.lives += n;
+        }
+
         increment_score(inc){
             this.score += inc;
         }

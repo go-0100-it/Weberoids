@@ -8,6 +8,7 @@ function init_game(resources, env, state, factory){
             this.missiles = [];
             this.ships = [];
             this.asteroids = [];
+            this.bonusProjectiles = [];
             this.asteroid_debris = [];
             this.explosions = [];
             this.spriteFactory = factory;
@@ -79,8 +80,12 @@ function init_game(resources, env, state, factory){
                     this.asteroids.push(sprite);
                     break;
                 case CONST.HEART:
-                    sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
-                    this.asteroids.push(sprite);
+                    sprite = this.spriteFactory.createBonusProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
+                    this.bonusProjectiles.push(sprite);
+                    break;
+                case CONST.GREEN_ORB:
+                    sprite = this.spriteFactory.createBonusProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
+                    this.bonusProjectiles.push(sprite);
                     break;
                 default:
                     break;
@@ -164,14 +169,30 @@ function init_game(resources, env, state, factory){
 
             =======================================================================================================*/
 
-
+            let bonus_projectiles_to_remove = [];
+            let len9 = this.bonusProjectiles.length;
+            for(let i = 0; i < len9; i++){
+                if(!this.paused){
+                    this.bonusProjectiles[i].update(env, factor, CONST);
+                }
+                this.bonusProjectiles[i].check_expiry() 
+                if(this.bonusProjectiles[i].toBeRemoved){
+                    console.log("REMOVING HEART")
+                    if(this.bonusProjectiles.indexOf(this.bonusProjectiles[i] !== -1)){
+                        bonus_projectiles_to_remove.push(this.bonusProjectiles[i]);
+                    }
+                }else{
+                    this.bonusProjectiles[i].draw(canvas, env, factor);
+                }
+            }
+            this.bonusProjectiles = this.bonusProjectiles.diff(bonus_projectiles_to_remove);
 
             // draw and update ships and sprites
             let missiles_to_remove = [];
             let len = this.missiles.length;
             for(let i = 0; i < len; i++){
                 if(!this.paused){
-                    this.missiles[i].update(env, factor);
+                    this.missiles[i].update(env, factor, CONST);
                 }
                 this.missiles[i].draw(canvas, env, factor);
                 if(this.missiles[i].check_expiry()){
@@ -187,8 +208,9 @@ function init_game(resources, env, state, factory){
             let len2 = this.ships.length;
             for(let i = 0; i < len2; i++){
                 if(!this.paused){
-                    this.ships[i].update(env, factor);
+                    this.ships[i].update(env, factor, CONST);
                 }
+                this.bonusProjectiles = this.ships[i].check_for_collision(this.bonusProjectiles, ships_to_remove, this);
                 this.asteroids = this.ships[i].check_for_collision(this.asteroids, ships_to_remove, this);
                 this.asteroid_debris = this.ships[i].check_for_collision(this.asteroid_debris, ships_to_remove, this);
                 this.ships[i].draw(canvas, env, factor);
@@ -200,7 +222,7 @@ function init_game(resources, env, state, factory){
             let len3 = this.asteroids.length;
             for(let i = 0; i < len3; i++){
                 if(!this.paused){
-                    this.asteroids[i].update(env, factor);
+                    this.asteroids[i].update(env, factor, CONST);
                 }
                 this.asteroids[i].draw(canvas, env, factor);
                 this.missiles = this.asteroids[i].check_for_collision(this.missiles, this.asteroids, asteroids_to_remove, this);
@@ -213,7 +235,7 @@ function init_game(resources, env, state, factory){
             let len4 = this.asteroid_debris.length;
             for(let i = 0; i < len4; i++){
                 if(!this.paused){
-                    this.asteroid_debris[i].update(env, factor);
+                    this.asteroid_debris[i].update(env, factor, CONST);
                 }
                 this.asteroid_debris[i].draw(canvas, env, factor);
                 this.missiles = this.asteroid_debris[i].check_for_collision(this.missiles, this.asteroid_debris, asteroid_debris_to_remove, this);
@@ -226,7 +248,7 @@ function init_game(resources, env, state, factory){
             let len5 = this.explosions.length;
             for(let i = 0; i < len5; i++){
                 if(!this.paused){
-                    this.explosions[i].update(env, factor);
+                    this.explosions[i].update(env, factor, CONST);
                 }
                 this.explosions[i].draw(canvas, env, factor);
                 if(this.explosions[i].check_expiry()){
@@ -250,7 +272,7 @@ function init_game(resources, env, state, factory){
             }else if(this.paused){
                 if(this.leveled_up){
                     if(this.levelUp.getAge() < 49){
-                        this.levelUp.update(env, 0);
+                        this.levelUp.update(env, 0, CONST);
                     }  
                     this.levelUp.draw(canvas, env, true);
                 }else{
@@ -272,11 +294,14 @@ function init_game(resources, env, state, factory){
                 let level = self.getState().getLevel();
                 let rnd_pos_org = Math.randInt(width-30, width-20);
                 let rnd_neg_org = 20;
+                let rnd_y_org = Math.randInt(100, self.getEnvironment().getCanvasHeight() - 100);
                 let rnd_pos_vel = Math.randInt(1, level + 1)
                 let rnd_neg_vel = -(Math.randInt(1, level + 1))
                 let origin = [];
                 let velocity = [];
+                let pos_neg = 1;
                 if(org1 < 2){
+                    pos_neg = -1;
                     origin = [rnd_pos_org, 0];
                     velocity = [rnd_neg_vel, 0];
                     if(org1 === 0){
@@ -301,8 +326,11 @@ function init_game(resources, env, state, factory){
                     }  
                 }
                 let spin = (org1 + 1) / 5000;
-                if(self.bonusCnt % 25 === 0){
-                    self.addSpaceProjectile(CONST.HEART, origin, velocity, 0, spin, 5);
+                if(self.bonusCnt % 15 === 0){
+                    self.addSpaceProjectile(CONST.HEART, [-20, rnd_y_org], [pos_neg*1, 0], 0, 0, 5);
+                }
+                if(self.bonusCnt % 20 === 0){
+                    self.addSpaceProjectile(CONST.GREEN_ORB, [-20, rnd_y_org], [4, 0], 0, 0, 5);
                 }
                 self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin, 5);
             }
@@ -356,6 +384,7 @@ function init_game(resources, env, state, factory){
             this.missiles = [];
             this.asteroids = [];
             this.asteroid_debris = [];
+            this.bonusProjectiles = [];
         }
 
         reset_view(){

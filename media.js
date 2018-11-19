@@ -21,6 +21,9 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             this.LEVEL_UP = "Level up";
             this.MISSILE_EXPLOSION = "Missile explosion";
             this.HEART = "Heart";
+            this.GREEN_ORB = "Green Orb";
+            this.HEART_COLLECTED = "Heart Collected";
+            this.GREEN_ORB_COLLECTED = "Green Orb Collected";
         }
     }
 
@@ -116,7 +119,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             CONST.BLUE_SHIP,
             new ImageInfo(CONST.BLUE_SHIP, ["http://davewaters.ca/res/images/blueships.png"], [75, 75], [150, 150], 50),
             "http://davewaters.ca/res/sounds/thrust.mp3",
-            new GamePlayData(CONST.BLUE_SHIP, CONST.FORCE_MISSILE, 2, 2)
+            new GamePlayData(CONST.BLUE_SHIP, CONST.BASIC_MISSILE, 2, 2)
         )
     )
     // missile image - shot1.png, shot2.png, shot3.png
@@ -204,7 +207,31 @@ function getMediaList(Media, ImageInfo, GamePlayData){
     media.push(
         new Media(
             CONST.HEART,
-            new ImageInfo(CONST.HEART, ["http://www.davewaters.ca/res/images/heart.png"], [25, 25], [50, 50], 10, 60, false),
+            new ImageInfo(CONST.HEART, ["http://www.davewaters.ca/res/images/heart.png"], [25, 25], [50, 50], 20, 200, false),
+            null,
+            null
+        )
+    )
+    media.push(
+        new Media(
+            CONST.GREEN_ORB,
+            new ImageInfo(CONST.GREEN_ORB, ["http://www.davewaters.ca/res/images/green_plasm_ball.png"], [45, 45], [90, 90], 50, 16, true),
+            null,
+            null
+        )
+    )
+    media.push(
+        new Media(
+            CONST.HEART_COLLECTED,
+            new ImageInfo(CONST.HEART_COLLECTED, ["http://www.davewaters.ca/res/images/heart_collected_1.png"], [50, 50], [100, 100], 10, 22, true),
+            "http://www.davewaters.ca/res/sounds/gain_life.mp3",
+            null
+        )
+    )
+    media.push(
+        new Media(
+            CONST.GREEN_ORB_COLLECTED,
+            new ImageInfo(CONST.GREEN_ORB_COLLECTED, ["http://www.davewaters.ca/res/images/green_orb_collected_1.png"], [50, 50], [100, 100], 10, 22, true),
             "http://www.davewaters.ca/res/sounds/gain_life.mp3",
             null
         )

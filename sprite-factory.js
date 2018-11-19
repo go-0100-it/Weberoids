@@ -16,6 +16,10 @@ function createSpriteFactory(){
         return new SpaceProjectile(pos, vel, ang, ang_vel, media, health);
     }
 
+    function createBonusProjectile(pos, vel, ang, ang_vel, media, health){
+        return new BonusProjectile(pos, vel, ang, ang_vel, media, health);
+    }
+
     function createBackgroundProjectile(pos, vel, ang, ang_vel, media){
         return new BackgroundProjectile(pos, vel, ang, ang_vel, media);
     }
@@ -33,6 +37,7 @@ function createSpriteFactory(){
         createShip: createShip,
         createExplosion: createExplosion,
         createSpaceProjectile: createSpaceProjectile,
+        createBonusProjectile: createBonusProjectile,
         createBackgroundProjectile: createBackgroundProjectile,
         createStatic: createStatic,
         createStaticAnimated: createStaticAnimated

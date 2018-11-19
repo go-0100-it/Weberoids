@@ -31,7 +31,7 @@ class Sprite{
         }
     }
 
-    static checkBounds(pos, vel, axis, size){
+    checkBounds(pos, vel, axis, size){
         if(pos + vel > axis + size / 2){
             return 0;
         }
@@ -49,6 +49,10 @@ class Sprite{
     getImage(){return this.image;};
 
     getAge(){return this.age;};
+
+    resetAge(){
+        this.age = 1;
+    }
 
     increaseAge(int){
         this.age += int;
@@ -103,8 +107,8 @@ class Sprite{
         let width = env.getCanvasWidth();
         let height = env.getCanvasHeight();
         let size = this.getImageSize();
-        this.pos[0] = pos ? pos[0] : Sprite.checkBounds(this.pos[0], this.vel[0] * factor, width, size[0])
-        this.pos[1] = pos ? pos[1] : Sprite.checkBounds(this.pos[1], this.vel[1] * factor, height, size[1])
+        this.pos[0] = pos ? pos[0] : this.checkBounds(this.pos[0], this.vel[0] * factor, width, size[0]);
+        this.pos[1] = pos ? pos[1] : this.checkBounds(this.pos[1], this.vel[1] * factor, height, size[1]);
     }
 
     playSound(){
@@ -122,7 +126,13 @@ class Sprite{
         let x = img_ctr[0] - half_img_x;
         let y = img_ctr[1] - half_img_y;
         if(this.isAnimation()){
-            x = size[0] * this.getAge(); 
+            if(this.name === CONST.GREEN_ORB){
+                if(this.getAge() === this.lifespan){
+                    this.resetAge();
+                }
+            }
+            x = size[0] * this.getAge();
+           
         }else if((this.getName() === CONST.BLUE_SHIP || this.getName() === CONST.BASIC_SHIP) && this.isThrusting()){
             x = size[0]; 
             this.update_thrust()
@@ -147,49 +157,45 @@ class Sprite{
         let objs1_to_remove = [];
         let len12 = objs1.length;
         for(let i = 0; i < len12; i++){
-            if(this.name !== CONST.HEART){
-                if(Sprite.collision_detect(this, objs1[i])){
-                    if(game.state.update_level()){
-                        game.level_up();
-                    };
-                    let explosionType = null;
-                    let explosion = null;
-                    let healthDepleted = false;
+            if(Sprite.collision_detect(this, objs1[i])){
+                if(game.state.update_level()){
+                    game.level_up();
+                };
+                let explosionType = null;
+                let explosion = null;
+                let healthDepleted = false;
 
 
-                    if(this.name === CONST.ASTEROID){
-                        console.dir(objs1[i])
-                        console.dir(this)
-                        if(this.health - objs1[i].power < 1){
-                            game.state.increment_score(50 * this.health);
-                        }else{
-                            game.state.increment_score(50 * objs1[i].power);
-                        }
-                        this.health = this.health - objs1[i].power;
-                        explosionType = CONST.MISSILE_EXPLOSION;
-                        if(this.health < 1){
-                            healthDepleted = true;
-                            explosionType = CONST.ASTEROID_EXPLOSION;
-                        }else{
-                            this.image = this.images[5 - this.health];
-                        }
-                        //game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
-
-
-                    }else if(this.name === CONST.ASTEROID_DEBRIS){
-                        game.state.increment_score(100);
-                        explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
+                if(this.name === CONST.ASTEROID){
+                    if(this.health - objs1[i].power < 1){
+                        game.state.increment_score(50 * this.health);
+                    }else{
+                        game.state.increment_score(50 * objs1[i].power);
                     }
+                    this.health = this.health - objs1[i].power;
+                    explosionType = CONST.MISSILE_EXPLOSION;
+                    if(this.health < 1){
+                        healthDepleted = true;
+                        explosionType = CONST.ASTEROID_EXPLOSION;
+                    }else{
+                        this.image = this.images[5 - this.health];
+                    }
+                    //game.addSpaceProjectile(CONST.ASTEROID_DEBRIS, this.pos, this.vel, 0, 0);
 
 
-                    explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
-                    if(explosion.sound){
-                        explosion.playSound();
-                    }
-                    objs1_to_remove.push(objs1[i]);
-                    if(objs2.indexOf(this) !== -1 && healthDepleted){
-                        objs2_to_remove.push(this);
-                    }
+                }else if(this.name === CONST.ASTEROID_DEBRIS){
+                    game.state.increment_score(100);
+                    explosionType = CONST.ASTEROID_DEBRIS_EXPLOSION;
+                }
+
+
+                explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
+                if(explosion.sound){
+                    explosion.playSound();
+                }
+                objs1_to_remove.push(objs1[i]);
+                if(objs2.indexOf(this) !== -1 && healthDepleted){
+                    objs2_to_remove.push(this);
                 }
             }
         }

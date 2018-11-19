@@ -33,6 +33,41 @@ class SpaceProjectile extends Sprite{
     }
 }
 
+class BonusProjectile extends Sprite{
+    constructor(pos, vel, ang, ang_vel, media){
+        super(pos, vel, ang, ang_vel, media);
+        this.health = media.gamePlayData !== null ? media.gamePlayData.health : 1;
+        this.toBeRemoved = false;
+        this.expired = false;
+    }
+
+    check_expiry(){
+        if(this.age >= this.lifespan){
+            this.expired = true;
+        }   
+       return
+        super.check_expiry();
+    }
+
+    checkBounds(pos, vel, axis, size){
+        if(pos + vel > axis + size / 2){
+            console.log("BONUS OUT OF BOUNDS")
+            this.toBeRemoved = this.expired;
+            return 0;
+        }
+        else if(pos + vel < 0 - size / 2){
+            console.log("BONUS OUT OF BOUNDS")
+            this.toBeRemoved = this.expired;
+            return axis;
+        }  
+        else{
+            pos += vel;
+            return pos;
+        }
+        super.checkBounds();  
+    }
+}
+
 class Static extends Sprite{
     constructor(pos, vel, ang, ang_vel, media){
         super(pos, vel, ang, ang_vel, media);

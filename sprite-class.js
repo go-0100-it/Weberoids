@@ -158,9 +158,6 @@ class Sprite{
         let len12 = objs1.length;
         for(let i = 0; i < len12; i++){
             if(Sprite.collision_detect(this, objs1[i])){
-                if(game.state.update_level()){
-                    game.level_up();
-                };
                 let explosionType = null;
                 let explosion = null;
                 let healthDepleted = false;
@@ -197,6 +194,9 @@ class Sprite{
                 if(objs2.indexOf(this) !== -1 && healthDepleted){
                     objs2_to_remove.push(this);
                 }
+                if(game.state.update_level()){
+                    game.level_up();
+                };
             }
         }
        return objs1.diff(objs1_to_remove);

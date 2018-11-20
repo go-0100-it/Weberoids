@@ -92,28 +92,35 @@ function init_game_state(){
             let leveled_up = true;
             if(this.level === 1 && this.score > 4999){
                 this.level = 2;
-                this.lives += this.level;
             }
             else if(this.level === 2 && this.score > 9999){
                 this.level = 3;
-                this.lives += this.level;
             }
-            else if(this.level === 3 && this.score > 17499){
+            else if(this.level === 3 && this.score > 15999){
                 this.level = 4;
-                this.lives += this.level;
             }
-            else if(this.level === 4 && this.score > 24999){
+            else if(this.level === 4 && this.score > 21999){
                 this.level = 5;
-                this.lives += this.level;
             }
-            else if(this.level === 5 && this.score > 32499){
+            else if(this.level === 5 && this.score > 28999){
                 this.level = 6;
-                this.lives += this.level;
             }
-            else if(this.level === 6 && this.score > 49999){
+            else if(this.level === 6 && this.score > 35999){
                 this.level = 7;
-                this.lives += this.level;
-            }else{
+            }
+            else if(this.level === 7 && this.score > 43999){
+                this.level = 8;
+            }
+            else if(this.level === 8 && this.score > 51999){
+                this.level = 9;
+            }
+            else if(this.level === 9 && this.score > 60999){
+                this.level = 10;
+            }
+            else if(this.level === 10 && this.score > 69999){
+                this.level = 100;
+            }
+            else{
                 leveled_up = false;
             }
             return leveled_up;

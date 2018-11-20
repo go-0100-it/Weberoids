@@ -16,7 +16,6 @@ function init_game(resources, env, state, factory){
             this.spawn_timer = null;
             this.leveled_up = false;
             this.bonusCnt = 0;
-            this.asteroidCnt = [3, 3, 4, 4, 3, 3, 4, 4]
             this.soundTrack = resources.getResource("Sound track").sound;
             this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
             this.debris = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
@@ -59,6 +58,52 @@ function init_game(resources, env, state, factory){
         gameOff(){
             this.state.game_on = false;
         };
+
+        drawShipHealth(canvas){
+            canvas.beginPath();
+            canvas.rect(15, 45, 250, 15);
+            canvas.lineWidth = 1;
+            canvas.globalAlpha = 1;
+            canvas.strokeStyle = '#ff1c17';
+            canvas.stroke();
+            canvas.closePath();
+            if(this.ships.length > 0){
+                let len = this.ships[0].health;
+                for(let i = 0; i < len ; i++){
+                    let b = 50 * i;
+                    canvas.beginPath();
+                    canvas.rect(15+b, 45, 50, 15);
+                    canvas.globalAlpha = 0.5;
+                    canvas.fillStyle = '#ff1c17';
+                    canvas.fill();
+                    canvas.closePath();
+                }
+            }
+            canvas.globalAlpha = 1;
+        }
+
+        drawPlasmLevel(canvas){
+            canvas.beginPath();
+            canvas.rect(15, 70, 250, 15);
+            canvas.lineWidth = 1;
+            canvas.globalAlpha = 1;
+            canvas.strokeStyle = '#38ff84';
+            canvas.stroke();
+            canvas.closePath();
+            if(this.ships.length > 0){
+                let len = this.ships[0].plasma;
+                for(let i = 0; i < len ; i++){
+                    let b = 1 * i;
+                    canvas.beginPath();
+                    canvas.rect(15+b, 70, 1, 15);
+                    canvas.globalAlpha = 0.5;
+                    canvas.fillStyle = '#38ff84';
+                    canvas.fill();
+                    canvas.closePath();
+                }
+            }
+            canvas.globalAlpha = 1;
+        }
 
         is_game_on(){
             return this.state.game_on;
@@ -281,6 +326,11 @@ function init_game(resources, env, state, factory){
             }else{
                 this.levelUp.age = 0;
             }
+
+            if(this.is_game_on()){
+                this.drawPlasmLevel(canvas);
+                this.drawShipHealth(canvas);
+            }
         }
             
 
@@ -288,15 +338,15 @@ function init_game(resources, env, state, factory){
         spawner(self){
             self.bonusCnt += 1;
             let CONST = self.env.getResources().CONST;
-            if(self.asteroids.length < self.asteroidCnt[self.state.level]){
+            let level = self.getState().getLevel();
+            if(self.asteroids.length < Math.ceil(level / 4) + 3){
                 let org1 = Math.randInt(0, 3)
                 let width = self.getEnvironment().getCanvasWidth();
-                let level = self.getState().getLevel();
                 let rnd_pos_org = Math.randInt(width-30, width-20);
                 let rnd_neg_org = 20;
                 let rnd_y_org = Math.randInt(100, self.getEnvironment().getCanvasHeight() - 100);
-                let rnd_pos_vel = Math.randInt(1, level + 1)
-                let rnd_neg_vel = -(Math.randInt(1, level + 1))
+                let rnd_pos_vel = (Math.randInt(1, Math.ceil(level / 2.75) + 2));
+                let rnd_neg_vel = -(Math.randInt(1, Math.ceil(level / 2.75) + 2))
                 let origin = [];
                 let velocity = [];
                 let pos_neg = 1;
@@ -326,11 +376,11 @@ function init_game(resources, env, state, factory){
                     }  
                 }
                 let spin = (org1 + 1) / 5000;
-                if(self.bonusCnt % 15 === 0){
-                    self.addSpaceProjectile(CONST.HEART, [-20, rnd_y_org], [pos_neg*1, 0], 0, 0, 5);
+                if(self.bonusCnt % 25 === 0){
+                    self.addSpaceProjectile(CONST.HEART, [-20, rnd_y_org], [pos_neg*(Math.ceil(level / 4)+2), 0], 0, 0, 5);
                 }
-                if(self.bonusCnt % 20 === 0){
-                    self.addSpaceProjectile(CONST.GREEN_ORB, [-20, rnd_y_org], [4, 0], 0, 0, 5);
+                if(self.bonusCnt % 10 === 0){
+                    self.addSpaceProjectile(CONST.GREEN_ORB, [-20, rnd_y_org], [(Math.ceil(level / 4)+3), 0], 0, 0, 5);
                 }
                 self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin, 5);
             }

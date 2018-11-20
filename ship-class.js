@@ -1,14 +1,13 @@
 class Ship extends Sprite{
     constructor(pos, vel, ang, ang_vel, media){
-        console.log("MEDIA");
-        console.dir(media);
         super(pos, vel, ang, ang_vel, media);
         this.health = media.gamePlayData.health;
+        this.plasma = 0;
         this.projectileType = media.gamePlayData.projectileType;
     }
     check_for_collision(objs, to_remove, game){
         let CONST = game.getResources().CONST;
-        let explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.SHIP_EXPLOSION));
+        let explosion1 = null;
         let objs_to_remove = [];
         let len = objs.length;
         for(let i = 0; i < len; i++){
@@ -18,27 +17,39 @@ class Ship extends Sprite{
 
                 if(objs[i].name == CONST.HEART){
                     explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.HEART_COLLECTED));
-                    game.state.gain_life(1);
+                    this.health += 1;
                 }else if(objs[i].name == CONST.GREEN_ORB){
                     explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.GREEN_ORB_COLLECTED));
+                    if(this.plasma + 25 > 250){
+                        this.plasma = 250;
+                    }else{
+                        this.plasma += 25;
+                    }
                     this.projectileType = CONST.FORCE_MISSILE;
                 }else{
+                    
+                    this.health -= 1;
+
+                    if(this.health < 1){
+                        explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.SHIP_EXPLOSION));
+                        to_remove.push(this);
+                        if(this.isThrusting()){
+                            this.thrustersOff();
+                        } 
+                    }
+
                     game.explosions.push(explosion2);
                     if(explosion2.sound){
                         explosion2.playSound();
                     } 
-                    game.state.lose_life();
-                    to_remove.push(this);
-                    if(this.isThrusting()){
-                        this.thrustersOff();
-                    } 
                 }
-
-                game.explosions.push(explosion1);
+                
+                if(explosion1){
+                    game.explosions.push(explosion1);
                     if(explosion1.sound){
                         explosion1.playSound();
                     }
-                
+                }
                 objs_to_remove.push(objs[i]);
             }  
         }                
@@ -83,6 +94,9 @@ class Ship extends Sprite{
     }   
         
     shoot(game){
+        if(this.plasma > 0){
+            this.plasma -= 1;
+        }
         let CONST = game.getResources().CONST;
         let pos_x = this.pos[0] + ((this.pos[0] + this.radius - this.pos[0]) * Math.cos(this.angle)) + ((this.pos[1] - this.pos[1]) * Math.sin(this.angle));
         let pos_y = this.pos[1] + ((this.pos[1] - this.pos[1]) * Math.cos(this.angle)) + ((this.pos[0] + this.radius - this.pos[0]) * Math.sin(this.angle));
@@ -90,6 +104,9 @@ class Ship extends Sprite{
         let forward = [Math.cos(this.angle), Math.sin(this.angle)];
         let vel_x = this.vel[0] + forward[0]*10;
         let vel_y = this.vel[1] + forward[1]*10;
+        if(this.plasma < 1){
+            this.projectileType = CONST.BASIC_MISSILE
+        }
         game.addExplosiveProjectile(this.projectileType, pos, [vel_x, vel_y], this.angle, 0);
     }    
     

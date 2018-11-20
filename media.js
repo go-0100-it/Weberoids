@@ -110,7 +110,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             CONST.BASIC_SHIP,
             new ImageInfo(CONST.BASIC_SHIP, ["http://davewaters.ca/res/images/double_ship.png"], [45, 45], [90, 90], 35),
             "http://davewaters.ca/res/sounds/thrust.mp3",
-            new GamePlayData(CONST.BASIC_SHIP, CONST.BASIC_MISSILE, 1, 1)
+            new GamePlayData(CONST.BASIC_SHIP, CONST.BASIC_MISSILE, 5, 1)
         )
     )
     // ship image
@@ -119,7 +119,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             CONST.BLUE_SHIP,
             new ImageInfo(CONST.BLUE_SHIP, ["http://davewaters.ca/res/images/blueships.png"], [75, 75], [150, 150], 50),
             "http://davewaters.ca/res/sounds/thrust.mp3",
-            new GamePlayData(CONST.BLUE_SHIP, CONST.BASIC_MISSILE, 2, 2)
+            new GamePlayData(CONST.BLUE_SHIP, CONST.BASIC_MISSILE, 5, 2)
         )
     )
     // missile image - shot1.png, shot2.png, shot3.png

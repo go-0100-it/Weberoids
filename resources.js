@@ -112,18 +112,22 @@ function init_resources(){
         //     else return 0;
         // } 
 
-        loadAudio(url, vol){
-            let audio = new Audio();
-            audio.src = url;
-            audio.preload = "auto";
-            audio.volume = vol;
-            return audio;
+        loadAudio(urls, vol){
+            let _audio = []
+            let len = urls.length;
+            for(let i = 0; i < len; i++){
+                let audio = new Audio();
+                audio.src = urls[i];
+                audio.preload = "auto";
+                audio.volume = vol;
+                _audio.push(audio);
+            }
+            return _audio;
         }
 
         loadSound(vol = 1){
             if(this.getSoundUrl() !== null){
                 this.setSound(this.loadAudio(this.getSoundUrl(), vol));
-                this.sound.addEventListener('canplaythrough', this.soundLoaded, false);
             }
         }
 

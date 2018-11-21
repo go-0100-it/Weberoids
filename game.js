@@ -10,18 +10,23 @@ function init_game(resources, env, state, factory){
             this.asteroids = [];
             this.bonusProjectiles = [];
             this.asteroid_debris = [];
-            this.explosions = [];
+            this.animations = [];
             this.spriteFactory = factory;
             this.spawn_interval = 2500;
             this.spawn_timer = null;
             this.leveled_up = false;
             this.bonusCnt = 0;
+            this.soundsPlaying = [];
+            this.shipHealthLow = false;
             this.soundTrack = resources.getResource("Sound track").sound;
             this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
             this.debris = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
             this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
+            this.warn_frame = this.spriteFactory.createStaticAnimated([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.WARN_FRAME));
             this.pausedMessage = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.PAUSED));
             this.levelUp = this.spriteFactory.createStaticAnimated(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.LEVEL_UP));
+            this.health_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.HEART));
+            this.plasma_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.GREEN_ORB));
         }
 
         startSpawning(){
@@ -41,7 +46,7 @@ function init_game(resources, env, state, factory){
 
         getAsteroidDebris(){return this.asteroid_debris;};
 
-        getExplosions(){return this.explosions;};
+        getanimations(){return this.animations;};
 
         getSpriteFactory(){return this.spriteFactory;};
 
@@ -60,8 +65,9 @@ function init_game(resources, env, state, factory){
         };
 
         drawShipHealth(canvas){
+            canvas.drawImage(this.health_icon.image, 12, 42, 22, 22);
             canvas.beginPath();
-            canvas.rect(15, 45, 250, 15);
+            canvas.rect(45, 45, 250, 15);
             canvas.lineWidth = 1;
             canvas.globalAlpha = 1;
             canvas.strokeStyle = '#ff1c17';
@@ -70,9 +76,8 @@ function init_game(resources, env, state, factory){
             if(this.ships.length > 0){
                 let len = this.ships[0].health;
                 for(let i = 0; i < len ; i++){
-                    let b = 50 * i;
                     canvas.beginPath();
-                    canvas.rect(15+b, 45, 50, 15);
+                    canvas.rect(45+i, 45, 1, 15);
                     canvas.globalAlpha = 0.5;
                     canvas.fillStyle = '#ff1c17';
                     canvas.fill();
@@ -83,8 +88,9 @@ function init_game(resources, env, state, factory){
         }
 
         drawPlasmLevel(canvas){
+            canvas.drawImage(this.plasma_icon.image, 0, 0, this.plasma_icon.image_size[0], this.plasma_icon.image_size[1], 7, 62, 30, 30);
             canvas.beginPath();
-            canvas.rect(15, 70, 250, 15);
+            canvas.rect(45, 70, 250, 15);
             canvas.lineWidth = 1;
             canvas.globalAlpha = 1;
             canvas.strokeStyle = '#38ff84';
@@ -93,9 +99,8 @@ function init_game(resources, env, state, factory){
             if(this.ships.length > 0){
                 let len = this.ships[0].plasma;
                 for(let i = 0; i < len ; i++){
-                    let b = 1 * i;
                     canvas.beginPath();
-                    canvas.rect(15+b, 70, 1, 15);
+                    canvas.rect(45+i, 70, 1, 15);
                     canvas.globalAlpha = 0.5;
                     canvas.fillStyle = '#38ff84';
                     canvas.fill();
@@ -148,7 +153,7 @@ function init_game(resources, env, state, factory){
                 case CONST.BASIC_MISSILE:
                 case CONST.FORCE_MISSILE:
                     if(sprite.sound){
-                        let sound = sprite.sound.cloneNode();
+                        let sound = sprite.sound[0].cloneNode();
                         sound.play();
                     }
                     this.missiles.push(sprite);
@@ -163,9 +168,9 @@ function init_game(resources, env, state, factory){
             let CONST = this.resources.CONST;
             let sprite = this.spriteFactory.createExplosion(pos, vel, ang, ang_vel, this.resources.getResource(type));
             if(sprite.sound){
-                sprite.sound.play();
+                sprite.sound[0].play();
             }
-            this.explosions.push(sprite);
+            this.animations.push(sprite);
             return sprite;
         }
 
@@ -183,7 +188,7 @@ function init_game(resources, env, state, factory){
 
         level_up(){
             this.pause("levelUp");
-            this.levelUp.sound.play();
+            this.levelUp.sound[0].play();
             this.leveled_up = true;
             this.levelUp.isShowing = true;
         }
@@ -289,25 +294,25 @@ function init_game(resources, env, state, factory){
             
 
 
-            let explosions_to_remove = [];
-            let len5 = this.explosions.length;
+            let animations_to_remove = [];
+            let len5 = this.animations.length;
             for(let i = 0; i < len5; i++){
                 if(!this.paused){
-                    this.explosions[i].update(env, factor, CONST);
+                    this.animations[i].update(env, factor, CONST);
                 }
-                this.explosions[i].draw(canvas, env, factor);
-                if(this.explosions[i].check_expiry()){
-                    if(this.explosions[i].getName() == CONST.SHIP_EXPLOSION){
+                this.animations[i].draw(canvas, env, factor);
+                if(this.animations[i].check_expiry()){
+                    if(this.animations[i].getName() == CONST.SHIP_EXPLOSION){
                         if(this.state.getLives() === 0){
                             this.end();
                         }else{
                             this.reset_view();
                         }
                     }
-                    explosions_to_remove.push(this.explosions[i]);
+                    animations_to_remove.push(this.animations[i]);
                 }     
             }
-            this.explosions = this.explosions.diff(explosions_to_remove);   
+            this.animations = this.animations.diff(animations_to_remove);   
 
             this.state.drawStateDetails(canvas);
 
@@ -330,6 +335,15 @@ function init_game(resources, env, state, factory){
             if(this.is_game_on()){
                 this.drawPlasmLevel(canvas);
                 this.drawShipHealth(canvas);
+            }
+
+            if(this.warn_frame.getAge() === this.warn_frame.lifespan){
+                this.warn_frame.age = 0;
+            }
+
+            if(this.shipHealthLow){
+                this.warn_frame.update(env, 0, CONST);
+                this.warn_frame.draw(canvas, env, true);
             }
         }
             
@@ -376,10 +390,10 @@ function init_game(resources, env, state, factory){
                     }  
                 }
                 let spin = (org1 + 1) / 5000;
-                if(self.bonusCnt % 25 === 0){
+                if(self.bonusCnt % 7 === 0){
                     self.addSpaceProjectile(CONST.HEART, [-20, rnd_y_org], [pos_neg*(Math.ceil(level / 4)+2), 0], 0, 0, 5);
                 }
-                if(self.bonusCnt % 10 === 0){
+                if(self.bonusCnt % 5 === 0){
                     self.addSpaceProjectile(CONST.GREEN_ORB, [-20, rnd_y_org], [(Math.ceil(level / 4)+3), 0], 0, 0, 5);
                 }
                 self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin, 5);
@@ -400,13 +414,15 @@ function init_game(resources, env, state, factory){
         start(){
             this.gameOn();
             this.splash.isShowing = false;
-            this.soundTrack.volume = 0.5;
+            this.soundTrack.volume = 0.2;
             this.soundTrack.loop = true;
-            this.soundTrack.play();
+            this.soundsPlaying.push(this.soundTrack[0])
+            this.soundTrack[0].play();
             this.reset_view();
             this.state.setScore(0);
             this.state.setLevel(1);
-            this.state.setLives(3);
+            this.state.setLives(0);
+            this.bonusCnt = 0;
             this.startSpawning();
         }
 
@@ -416,18 +432,24 @@ function init_game(resources, env, state, factory){
 
         pause(){
             this.paused = !this.paused;
+            let len = this.soundsPlaying.length;
             if(this.paused){
-                this.soundTrack.pause();
+                for(let i = 0; i < len; i++){
+                    this.soundsPlaying[i].pause();
+                }
             }else{
-                this.soundTrack.play();
+                for(let i = 0; i < len; i++){
+                    this.soundsPlaying[i].play();
+                }
             }
         } 
 
         end(){
             this.gameOff();
-            this.soundTrack.pause();
-            this.soundTrack.loop = false;
-            this.soundTrack.currentTime = 0;
+            this.soundTrack[0].pause();
+            this.soundTrack[0].loop = false;
+            this.soundTrack[0].currentTime = 0;
+            this.soundsPlaying = [];
         }
 
         clearProjectiles(){
@@ -441,6 +463,7 @@ function init_game(resources, env, state, factory){
             let CONST = env.getResources().CONST;
             if(this.is_game_on()){
                 this.clearProjectiles();
+                this.bonusCnt = 0;
                 this.addShip(CONST.BLUE_SHIP, env.getCanvasCenter(), [0, 0], 0, 0);
             }
         }

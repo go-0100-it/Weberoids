@@ -13,41 +13,22 @@ class Ship extends Sprite{
         for(let i = 0; i < len; i++){
             if(Sprite.collision_detect(this, objs[i])){
 
-                let explosion2 = game.spriteFactory.createExplosion(objs[i].pos, objs[i].vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
-
-                if(objs[i].name == CONST.HEART){
-                    explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.HEART_COLLECTED));
-                    this.health += 1;
-                }else if(objs[i].name == CONST.GREEN_ORB){
-                    explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.GREEN_ORB_COLLECTED));
-                    if(this.plasma + 25 > 250){
-                        this.plasma = 250;
-                    }else{
-                        this.plasma += 25;
-                    }
-                    this.projectileType = CONST.FORCE_MISSILE;
+                if(objs[i].name == CONST.HEART || objs[i].name == CONST.GREEN_ORB){
+                    
+                    explosion1 = this.collideWithBonus(objs[i].name, game);
+                
                 }else{
                     
-                    this.health -= 1;
-
-                    if(this.health < 1){
-                        explosion1 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.SHIP_EXPLOSION));
-                        to_remove.push(this);
-                        if(this.isThrusting()){
-                            this.thrustersOff();
-                        } 
-                    }
-
-                    game.explosions.push(explosion2);
-                    if(explosion2.sound){
-                        explosion2.playSound();
-                    } 
+                     explosion1 = this.collideWithSpaceProjectile(objs[i], to_remove, game);
+                     
                 }
+
+                this.healthWarning(game);
                 
                 if(explosion1){
-                    game.explosions.push(explosion1);
+                    game.animations.push(explosion1);
                     if(explosion1.sound){
-                        explosion1.playSound();
+                        explosion1.sound[0].play();
                     }
                 }
                 objs_to_remove.push(objs[i]);
@@ -57,16 +38,107 @@ class Ship extends Sprite{
         super.check_for_collision();
     }
 
+    collideWithSpaceProjectile(obj, to_remove, game){
+
+        let CONST = game.getResources().CONST;
+        let animation = null;
+        let animation2 = null;
+        let type = obj.name;
+        switch(type){
+            case CONST.ASTEROID:
+                this.health -= obj.health * 10;
+                animation = game.spriteFactory.createExplosion(obj.pos, obj.vel, 0, 0, game.resources.getResource(CONST.ASTEROID_EXPLOSION));
+                if(this.health < 0){
+                    animation2 = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.SHIP_EXPLOSION));
+                    to_remove.push(this);
+                    game.state.lose_life();
+                    if(this.isThrusting()){
+                        this.thrustersOff();
+                    }
+                    let index = game.soundsPlaying.indexOf(this.sound[1]);
+                    if (index > -1) {
+                        game.soundsPlaying.splice(index, 1);
+                    }
+                    this.sound[1].pause(); 
+                }else{
+                    animation2 = game.spriteFactory.createStaticAnimated([0,0], [0,0], 0, 0, game.resources.getResource(CONST.WARN_FRAME));
+                }
+                break;
+            case CONST.ASTEROID_DEBRIS:
+                animation = game.spriteFactory.createExplosion(obj.pos, obj.vel, 0, 0, game.resources.getResource(CONST.ASTEROID_DEBRIS_EXPLOSION));
+                break;
+            default:
+                break;
+        }
+        if(animation){
+            game.animations.push(animation);
+            if(animation.sound){
+                animation.sound[0].play();
+            }
+        }
+        return animation2;
+    }
+
+    collideWithBonus(type, game){
+        let CONST = game.getResources().CONST;
+        let animation = null;
+        switch(type){
+
+            case CONST.HEART:
+                animation = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.HEART_COLLECTED));       
+                if(this.health + 20 > 250){
+                    this.health = 250;
+                }else{
+                    this.health += 20;
+                }
+                //this.healthWarning(game);
+                break;
+
+            case CONST.GREEN_ORB:
+                animation = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.GREEN_ORB_COLLECTED));
+                if(this.plasma + 20 > 250){
+                    this.plasma = 250;
+                }else{
+                    this.plasma += 20;
+                }
+                this.projectileType = CONST.FORCE_MISSILE;
+                break;
+
+            default:
+                break;
+        }
+        return animation;
+    }
+
+    healthWarning(game){
+        let index = game.soundsPlaying.indexOf(this.sound[1]);
+        if(this.health > -1 && this.health < 50){
+            game.shipHealthLow = true;
+            this.sound[1].loop = true;
+            this.sound[1].volume = 0.3;
+            this.sound[1].play();
+            if(index === -1) {
+                game.soundsPlaying.push(this.sound[1]);
+            }
+        }else{
+            game.shipHealthLow = false;
+            if(index > -1) {
+                game.soundsPlaying.splice(index, 1);
+            }
+            this.sound[1].pause();
+        }
+    }
+
     thrustersOn(){
         if(this.sound){
-            this.playSound();
+            this.sound[0].play();
         } 
         this.thrust = true;
     }  
         
     thrustersOff(){
         if(this.sound){
-            this.sound.pause();
+            this.sound[0].pause();
         } 
         this.thrust = false;
     }  

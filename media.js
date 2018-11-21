@@ -13,6 +13,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             this.BASIC_SPACE = "Basic space";
             this.BLUE_NEBULA = "Blue Nebula";
             this.BROWN_NEBULA = "Brown Nebula";
+            this.WARN_FRAME = "Warn frame";
             this.ASTEROID = "Asteroid";
             this.ASTEROID_DEBRIS = "Astroid debris";
             this.ASTEROID_EXPLOSION = "Asteroid explosion";
@@ -45,7 +46,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             null,
             //"http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3"
             //"http://www.davewaters.ca/res/sounds/soundtrack2.mp3"
-            "http://www.davewaters.ca/res/sounds/IntoTheSing.mp3",
+            ["http://www.davewaters.ca/res/sounds/IntoTheSing.mp3"],
             null
         )
     )
@@ -86,6 +87,14 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             null
         )
     )
+    media.push(
+        new Media(
+            CONST.WARN_FRAME,
+            new ImageInfo(CONST.WARN_FRAME, ["http://davewaters.ca/res/images/warn_frame.png"], [250, 250], [500, 500], 10, 28, true),
+            null,
+            null
+        )
+    )
     // splash image
     media.push(
         new Media(
@@ -109,7 +118,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.BASIC_SHIP,
             new ImageInfo(CONST.BASIC_SHIP, ["http://davewaters.ca/res/images/double_ship.png"], [45, 45], [90, 90], 35),
-            "http://davewaters.ca/res/sounds/thrust.mp3",
+            ["http://davewaters.ca/res/sounds/thrust.mp3"],
             new GamePlayData(CONST.BASIC_SHIP, CONST.BASIC_MISSILE, 5, 1)
         )
     )
@@ -118,8 +127,8 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.BLUE_SHIP,
             new ImageInfo(CONST.BLUE_SHIP, ["http://davewaters.ca/res/images/blueships.png"], [75, 75], [150, 150], 50),
-            "http://davewaters.ca/res/sounds/thrust.mp3",
-            new GamePlayData(CONST.BLUE_SHIP, CONST.BASIC_MISSILE, 5, 2)
+            ["http://davewaters.ca/res/sounds/thrust.mp3","http://davewaters.ca/res/sounds/health_warning.mp3"],
+            new GamePlayData(CONST.BLUE_SHIP, CONST.BASIC_MISSILE, 250, 2)
         )
     )
     // missile image - shot1.png, shot2.png, shot3.png
@@ -127,7 +136,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.BASIC_MISSILE,
             new ImageInfo(CONST.BASIC_MISSILE, ["http://davewaters.ca/res/images/shot2.png"], [5,5], [10, 10], 4, 60),
-            "http://www.davewaters.ca/res/sounds/laser.mp3",
+            ["http://www.davewaters.ca/res/sounds/laser.mp3"],
             new GamePlayData(CONST.BASIC_MISSILE, null, 1, 1)
         )
     )
@@ -136,7 +145,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.FORCE_MISSILE,
             new ImageInfo(CONST.FORCE_MISSILE, ["http://davewaters.ca/res/images/force_missile.png"], [40, 7.5], [80, 15], 4, 60),
-            "http://www.davewaters.ca/res/sounds/laser.mp3",
+            ["http://www.davewaters.ca/res/sounds/laser.mp3"],
             new GamePlayData(CONST.FORCE_MISSILE, null, 1, 3)
         )
     )
@@ -168,7 +177,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.ASTEROID_EXPLOSION,
             new ImageInfo(CONST.ASTEROID_EXPLOSION, ["http://www.davewaters.ca/res/images/rock_explode2.png"], [60, 60], [120, 120], 20, 48, true),
-            explosion_sound,
+            [explosion_sound],
             null
         )
     )
@@ -176,7 +185,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.ASTEROID_DEBRIS_EXPLOSION,
             new ImageInfo(CONST.ASTEROID_DEBRIS_EXPLOSION, ["http://www.davewaters.ca/res/images/asteroid_debris_explode.png"], [30, 30], [60, 60], 10, 24, true),
-            explosion_sound,
+            [explosion_sound],
             null
         )
     )
@@ -184,7 +193,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.SHIP_EXPLOSION,
             new ImageInfo(CONST.SHIP_EXPLOSION, ["http://www.davewaters.ca/res/images/explosion_alpha.png"], [64, 64], [128, 128], 17, 24, true),
-            "http://www.davewaters.ca/res/sounds/ship_explosion.mp3",
+            ["http://www.davewaters.ca/res/sounds/ship_explosion.mp3"],
             null
         )
     )
@@ -192,7 +201,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.LEVEL_UP,
             new ImageInfo(CONST.LEVEL_UP, ["http://www.davewaters.ca/res/images/level_up.png"], [350, 230], [700, 460], 5, 50, true),
-            "http://www.davewaters.ca/res/sounds/level_up.mp3",
+            ["http://www.davewaters.ca/res/sounds/level_up.mp3"],
             null
         )
     )
@@ -200,7 +209,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.MISSILE_EXPLOSION,
             new ImageInfo(CONST.MISSILE_EXPLOSION, ["http://www.davewaters.ca/res/images/missile_explosion.png"], [25, 25], [50, 50], 10, 24, true),
-            explosion_sound,
+            [explosion_sound],
             null
         )
     )
@@ -224,7 +233,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.HEART_COLLECTED,
             new ImageInfo(CONST.HEART_COLLECTED, ["http://www.davewaters.ca/res/images/heart_collected_1.png"], [50, 50], [100, 100], 10, 22, true),
-            "http://www.davewaters.ca/res/sounds/gain_life.mp3",
+            ["http://www.davewaters.ca/res/sounds/gain_life.mp3"],
             null
         )
     )
@@ -232,7 +241,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
         new Media(
             CONST.GREEN_ORB_COLLECTED,
             new ImageInfo(CONST.GREEN_ORB_COLLECTED, ["http://www.davewaters.ca/res/images/green_orb_collected_1.png"], [50, 50], [100, 100], 10, 22, true),
-            "http://www.davewaters.ca/res/sounds/gain_life.mp3",
+            ["http://www.davewaters.ca/res/sounds/gain_life.mp3"],
             null
         )
     )

@@ -110,12 +110,6 @@ class Sprite{
         this.pos[0] = pos ? pos[0] : this.checkBounds(this.pos[0], this.vel[0] * factor, width, size[0]);
         this.pos[1] = pos ? pos[1] : this.checkBounds(this.pos[1], this.vel[1] * factor, height, size[1]);
     }
-
-    playSound(){
-        if(this.sound){
-            this.sound.play();
-        }
-    }
         
     draw(canvas, env, factor){
         let CONST = env.getResources().CONST;
@@ -142,7 +136,11 @@ class Sprite{
         if(this.getAngle() !== 0){
             this.drawRotated(canvas, x, y, new_x, new_y)
         }else{
-            canvas.drawImage(this.getImage(), x, y, size[0], size[1], new_x, new_y, size[0], size[1]);
+            if(this.name === CONST.WARN_FRAME){
+                canvas.drawImage(this.getImage(), x, y, size[0], size[1], 0, 0, env.getCanvasWidth(), env.getCanvasHeight());
+            }else{
+                canvas.drawImage(this.getImage(), x, y, size[0], size[1], new_x, new_y, size[0], size[1]);
+            }
         }
     }   
     
@@ -188,7 +186,7 @@ class Sprite{
 
                 explosion = game.addExplosion(explosionType, this.pos, this.vel, 0, 0);
                 if(explosion.sound){
-                    explosion.playSound();
+                    explosion.sound[0].play();
                 }
                 objs1_to_remove.push(objs1[i]);
                 if(objs2.indexOf(this) !== -1 && healthDepleted){

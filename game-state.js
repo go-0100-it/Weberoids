@@ -6,7 +6,7 @@ function init_game_state(){
             this.game_on = false;
             this.level = 1;
             this.universe = 1;
-            this.lives = 3;
+            this.lives = 1;
             this.ships = [];
             this.explosiveProjectiles = {};
             this.shields = 0;
@@ -70,7 +70,6 @@ function init_game_state(){
             canvas.font="20px Arial";
             canvas.fillStyle="#FFFFFF";
             canvas.fillText("SCORE  " + this.score,15,30);
-            canvas.fillText("LIVES  " + this.lives,1100,30);
             canvas.font="40px Arial";
             canvas.fillText("LEVEL  " + this.level,530,50);
             //console.log("TEXTING")

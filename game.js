@@ -19,13 +19,15 @@ function init_game(resources, env, state, factory){
             this.soundsPlaying = [];
             this.shipHealthLow = false;
             this.soundTrack = resources.getResource("Sound track").sound;
-            this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
+            this.basicSpace = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BASIC_SPACE));
+            this.blueNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BLUE_NEBULA));
+            this.brownNebula = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.BROWN_NEBULA));
             this.debris = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.DEBRIS));
             this.splash = this.spriteFactory.createStatic(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.SPLASH));
             this.warn_frame = this.spriteFactory.createStaticAnimated([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.WARN_FRAME));
             this.pausedMessage = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.PAUSED));
             this.levelUp = this.spriteFactory.createStaticAnimated(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.LEVEL_UP));
-            this.health_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.HEART));
+            this.health_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.HEART_ANIMATION));
             this.plasma_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.GREEN_ORB));
         }
 
@@ -88,9 +90,9 @@ function init_game(resources, env, state, factory){
         }
 
         drawPlasmLevel(canvas){
-            canvas.drawImage(this.plasma_icon.image, 0, 0, this.plasma_icon.image_size[0], this.plasma_icon.image_size[1], 7, 62, 30, 30);
+            canvas.drawImage(this.plasma_icon.image, 0, 0, this.plasma_icon.image_size[0], this.plasma_icon.image_size[1], 7, 67, 30, 30);
             canvas.beginPath();
-            canvas.rect(45, 70, 250, 15);
+            canvas.rect(45, 75, 250, 15);
             canvas.lineWidth = 1;
             canvas.globalAlpha = 1;
             canvas.strokeStyle = '#38ff84';
@@ -100,7 +102,7 @@ function init_game(resources, env, state, factory){
                 let len = this.ships[0].plasma;
                 for(let i = 0; i < len ; i++){
                     canvas.beginPath();
-                    canvas.rect(45+i, 70, 1, 15);
+                    canvas.rect(45+i, 75, 1, 15);
                     canvas.globalAlpha = 0.5;
                     canvas.fillStyle = '#38ff84';
                     canvas.fill();
@@ -129,7 +131,7 @@ function init_game(resources, env, state, factory){
                     sprite = this.spriteFactory.createSpaceProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
                     this.asteroids.push(sprite);
                     break;
-                case CONST.HEART:
+                case CONST.HEART_ANIMATION:
                     sprite = this.spriteFactory.createBonusProjectile(pos, vel, ang, ang_vel, this.resources.getResource(type));
                     this.bonusProjectiles.push(sprite);
                     break;
@@ -205,7 +207,21 @@ function init_game(resources, env, state, factory){
         draw(env, factor){
             let canvas = env.getContext();
             let CONST = env.getResources().CONST;
-            this.blueNebula.draw(canvas, env);
+
+            switch(this.state.universe){
+                case 1:
+                    this.basicSpace.draw(canvas, env);
+                    break;
+                case 2:
+                    this.blueNebula.draw(canvas, env);
+                    break;
+                case 3:
+                    this.brownNebula.draw(canvas, env);
+                    break;
+                default:
+                    break;
+            }
+            
             if(!this.paused){
                 this.state.increment_time();
             }
@@ -390,11 +406,11 @@ function init_game(resources, env, state, factory){
                     }  
                 }
                 let spin = (org1 + 1) / 5000;
-                if(self.bonusCnt % 7 === 0){
-                    self.addSpaceProjectile(CONST.HEART, [-20, rnd_y_org], [pos_neg*(Math.ceil(level / 4)+2), 0], 0, 0, 5);
+                if(self.bonusCnt % 8 === 0){
+                    self.addSpaceProjectile(CONST.HEART_ANIMATION, [-20, rnd_y_org], [pos_neg*(Math.ceil(level / 4)+2), 0], 0, 0, 5);
                 }
                 if(self.bonusCnt % 5 === 0){
-                    self.addSpaceProjectile(CONST.GREEN_ORB, [-20, rnd_y_org], [(Math.ceil(level / 4)+3), 0], 0, 0, 5);
+                    self.addSpaceProjectile(CONST.GREEN_ORB, [-20, rnd_y_org], [pos_neg*(Math.ceil(level / 4)+3), 0], 0, 0, 5);
                 }
                 self.addSpaceProjectile(CONST.ASTEROID, origin, velocity, 0, spin, 5);
             }
@@ -419,8 +435,9 @@ function init_game(resources, env, state, factory){
             this.soundsPlaying.push(this.soundTrack[0])
             this.soundTrack[0].play();
             this.reset_view();
-            this.state.setScore(0);
+            this.state.setScore(65000);
             this.state.setLevel(1);
+            this.state.setUniverse(1);
             this.state.setLives(0);
             this.bonusCnt = 0;
             this.startSpawning();

@@ -120,7 +120,7 @@ class Sprite{
         let x = img_ctr[0] - half_img_x;
         let y = img_ctr[1] - half_img_y;
         if(this.isAnimation()){
-            if(this.name === CONST.GREEN_ORB){
+            if(this.name === CONST.GREEN_ORB || this.name === CONST.HEART_ANIMATION){
                 if(this.getAge() === this.lifespan){
                     this.resetAge();
                 }

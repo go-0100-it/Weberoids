@@ -10,6 +10,12 @@ function init_game_state(){
             this.ships = [];
             this.explosiveProjectiles = {};
             this.shields = 0;
+            this.levelUpScores = [ 
+                [], 
+                [ 0, 4999, 9999, 15999, 21999, 28999, 35999, 43999, 51999, 60999, 69999],
+                [ 0, 4999, 9999, 15999, 21999, 28999, 35999, 43999, 51999, 60999, 69999],
+                [ 0, 4999, 9999, 15999, 21999, 28999, 35999, 43999, 51999, 60999, 69999],
+            ]
         }
 
         setLives(int){
@@ -38,6 +44,14 @@ function init_game_state(){
         
         setLevel(int){
             this.level = int;
+        }
+
+        setUniverse(int){
+            this.universe = int;
+        }
+
+        incUniverse(){
+            this.universe += 1;
         }
             
         lose_life(){
@@ -89,35 +103,17 @@ function init_game_state(){
 
         update_level(){
             let leveled_up = true;
-            if(this.level === 1 && this.score > 4999){
-                this.level = 2;
+            let lvl_up_scores = this.levelUpScores[this.universe];
+            if(this.level < lvl_up_scores.length - 1 && this.score > lvl_up_scores[this.level]){
+                this.level += 1;
             }
-            else if(this.level === 2 && this.score > 9999){
-                this.level = 3;
-            }
-            else if(this.level === 3 && this.score > 15999){
-                this.level = 4;
-            }
-            else if(this.level === 4 && this.score > 21999){
-                this.level = 5;
-            }
-            else if(this.level === 5 && this.score > 28999){
-                this.level = 6;
-            }
-            else if(this.level === 6 && this.score > 35999){
-                this.level = 7;
-            }
-            else if(this.level === 7 && this.score > 43999){
-                this.level = 8;
-            }
-            else if(this.level === 8 && this.score > 51999){
-                this.level = 9;
-            }
-            else if(this.level === 9 && this.score > 60999){
-                this.level = 10;
-            }
-            else if(this.level === 10 && this.score > 69999){
-                this.level = 100;
+            else if(this.level === lvl_up_scores.length - 1 && this.score > lvl_up_scores[this.level]){
+                if(this.universe < this.levelUpScores.length - 1){
+                    this.setLevel(1);
+                    this.incUniverse();
+                }else{
+                    leveled_up = false;
+                }
             }
             else{
                 leveled_up = false;

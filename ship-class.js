@@ -13,7 +13,7 @@ class Ship extends Sprite{
         for(let i = 0; i < len; i++){
             if(Sprite.collision_detect(this, objs[i])){
 
-                if(objs[i].name == CONST.HEART || objs[i].name == CONST.GREEN_ORB){
+                if(objs[i].name == CONST.HEART_ANIMATION || objs[i].name == CONST.GREEN_ORB){
                     
                     explosion1 = this.collideWithBonus(objs[i].name, game);
                 
@@ -84,7 +84,7 @@ class Ship extends Sprite{
         let animation = null;
         switch(type){
 
-            case CONST.HEART:
+            case CONST.HEART_ANIMATION:
                 animation = game.spriteFactory.createExplosion(this.pos, this.vel, 0, 0, game.resources.getResource(CONST.HEART_COLLECTED));       
                 if(this.health + 20 > 250){
                     this.health = 250;

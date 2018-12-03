@@ -21,7 +21,7 @@ function getMediaList(Media, ImageInfo, GamePlayData){
             this.SHIP_EXPLOSION = "Ship explosion";
             this.LEVEL_UP = "Level up";
             this.MISSILE_EXPLOSION = "Missile explosion";
-            this.HEART = "Heart";
+            this.HEART_ANIMATION = "Heart Animation";
             this.GREEN_ORB = "Green Orb";
             this.HEART_COLLECTED = "Heart Collected";
             this.GREEN_ORB_COLLECTED = "Green Orb Collected";
@@ -215,8 +215,8 @@ function getMediaList(Media, ImageInfo, GamePlayData){
     )
     media.push(
         new Media(
-            CONST.HEART,
-            new ImageInfo(CONST.HEART, ["http://www.davewaters.ca/res/images/heart.png"], [25, 25], [50, 50], 20, 200, false),
+            CONST.HEART_ANIMATION,
+            new ImageInfo(CONST.HEART_ANIMATION, ["http://www.davewaters.ca/res/images/heart-animation.png"], [25, 25], [50, 50], 20, 46, true),
             null,
             null
         )

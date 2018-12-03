@@ -27,7 +27,7 @@ function init_game(resources, env, state, factory){
             this.warn_frame = this.spriteFactory.createStaticAnimated([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.WARN_FRAME));
             this.pausedMessage = this.spriteFactory.createStatic(this.env.getCanvasCenter, [0,0], 0, 0, resources.getResource(this.resources.CONST.PAUSED));
             this.levelUp = this.spriteFactory.createStaticAnimated(this.env.getCanvasCenter(), [0,0], 0, 0, resources.getResource(this.resources.CONST.LEVEL_UP));
-            this.health_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.HEART_ANIMATION));
+            this.health_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.HEART));
             this.plasma_icon = this.spriteFactory.createStatic([0,0], [0,0], 0, 0, resources.getResource(this.resources.CONST.GREEN_ORB));
         }
 
@@ -435,7 +435,7 @@ function init_game(resources, env, state, factory){
             this.soundsPlaying.push(this.soundTrack[0])
             this.soundTrack[0].play();
             this.reset_view();
-            this.state.setScore(65000);
+            this.state.setScore(0);
             this.state.setLevel(1);
             this.state.setUniverse(1);
             this.state.setLives(0);
